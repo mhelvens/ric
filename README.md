@@ -1,4 +1,4 @@
-ApiNATOMY
+Ric
 =====
 
-interactive visualization of multiscale anatomy and biomedical knowledge
+a lightweight RICORDO alternative for BioMaps
