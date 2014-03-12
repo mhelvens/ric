@@ -2,103 +2,103 @@
 
 ///////////////////////// Includes /////////////////////////
 
-var vars = require('./vars');
-
-var mongoose = require('mongoose');
-
 var _ = require('lodash');
+var vars = require('./vars');
+var db = require('./db');
+var express = require('express');
 
+var app = express();
 
-////////// Experimentation with Mongoose //////////
+///////////////////////// HTTP Status Codes /////////////////////////
 
-var db = mongoose.connect('localhost', 'ric');
+var HTTP_OK = 200;
+var HTTP_CREATED = 201;
+var HTTP_NOT_FOUND = 404;
 
-var SCHEMA_OPTIONS = {
-	id:     false,
-	_id:    false,
-	strict: false
-};
+///////////////////////// General Middleware /////////////////////////
 
+//app.use(express.logger());
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(express.methodOverride());
+app.use(app.router);
 
-function StringType(other) {
-	return _.assign({
-		type:    String,
-		default: '',
-		trim:    true
-	}, other);
-}
+///////////////////////// API /////////////////////////
 
-function StructureReference(other) {
-	return StringType(_.assign({ ref: 'Structure' }, other));
-}
-
-function StringEnum() {
-	return {
-		type: String,
-		trim: true,
-		enum: _.toArray(arguments)
-	};
-}
-
-
-var substructureSchema = new mongoose.Schema({
-	structure: StructureReference(),
-	type:      StringEnum('regional part', 'constitutional part', 'subclass', 'seed')
-}, SCHEMA_OPTIONS);
-
-var structureSchema = new mongoose.Schema({
-	_id:         StringType({ unique: true }),
-	name:        StringType(),
-	description: StringType(),
-	sub:         [substructureSchema]
-}, SCHEMA_OPTIONS);
-
-var connectionSchema = new mongoose.Schema({
-	from: StructureReference(),
-	to:   StructureReference(),
-	type: StringType()
-}, SCHEMA_OPTIONS);
-connectionSchema.index({ from: 1, to: 1 }, { unique: true });
-
-var metadataSchema = new mongoose.Schema({
-	resource:  StructureReference(),
-	structure: StructureReference(),
-	type:      StringType()
-}, SCHEMA_OPTIONS);
-connectionSchema.index({ resource: 1, structure: 1 }, { unique: true });
-
-
-var Structure = mongoose.model('Structure', structureSchema);
-var Connection = mongoose.model('Connection', connectionSchema);
-var Metadata = mongoose.model('Metadata', metadataSchema);
-
-
-//_([
-//	{_id: 'tile:60000001', name: "A"},
-//	{_id: 'tile:60000002', name: "B"},
-//	{_id: 'tile:60000003', name: "C"},
-//	{_id: 'tile:60000004', name: "D", sub: [
-//		{structure: 'tile:60000001', type: 'regional part'},
-//		{structure: 'tile:60000005', type: 'constitutional part'}
-//	]},
-//	{_id: 'tile:60000005', name: "E", sub: [
-//		{structure: 'tile:60000001', type: 'regional part'},
-//		{structure: 'tile:60000002', type: 'constitutional part'},
-//		{structure: 'tile:60000003', type: 'subclass'}
-//	]}
-//]).each
-//(function (fields) {
-//	Structure.create(fields, function (err, structure) {
-//		if (err) { console.log(err); }
-//	});
-//});
-
-
-Structure.findOne({ _id: 'tile:60000004' }).populate('sub.structure').exec
-(function (err, structure) {
-	if (err) {
-		console.log(err);
-	} else {
-		console.log(JSON.stringify(structure, undefined, '    '));
-	}
+// get entities with passed ids
+app.get('/resources/entities/:ids', function (req, res) {
+	var ids = req.params.ids.split(',');
+	db.Entity.find()
+			.where('_id').in(ids)
+			.populate('sub.entity', '_id')
+			.exec(function (err, ents) {
+				if (err) {
+					console.error(err); // TODO: proper error handling
+					res.status(HTTP_NOT_FOUND).send(null);
+				} else {
+					res.status(HTTP_OK).json(ents);
+				}
+			});
 });
+
+// get connections between the entities with passed ids
+app.get('/resources/connections/:ids', function (req, res) {
+	var ids = req.params.ids.split(',');
+	db.Connection.find()
+			.where('from').in(ids)
+			.where('to').in(ids)
+			.exec(function (err, ents) {
+				if (err) {
+					console.error(err); // TODO: proper error handling
+					res.status(HTTP_NOT_FOUND).send(null);
+				} else {
+					res.status(HTTP_OK).json(ents);
+				}
+			});
+});
+
+// get metadata belonging to entities with passed ids
+app.get('/resources/metadata/:ids', function (req, res) {
+	var ids = req.params.ids.split(',');
+	db.Metadata.find()
+			.where('entity').in(ids)
+			.exec(function (err, ents) {
+				if (err) {
+					console.error(err); // TODO: proper error handling
+					res.status(HTTP_NOT_FOUND).send(null);
+				} else {
+					res.status(HTTP_OK).json(ents);
+				}
+			});
+});
+
+// TODO: API
+
+///////////////////////// Special Exceptions /////////////////////////
+
+//// The bootstrap glyphicons need special treatment:
+
+app.get('/bootstrap/glyphicons-halflings-regular.*', function (req, res) {
+	res.redirect('/lib/bootstrap-sass-official/vendor/assets/fonts/' + req.path);
+});
+
+app.get('/require.js', function (req, res) {
+	res.redirect('/lib/requirejs/require.js');
+});
+
+///////////////////////// Client-side Routes /////////////////////////
+
+// TODO: Specify 'get' directives to route each to index.html
+
+//function serveIndex(req, res, next) {
+//	req.url = '/';
+//	next();
+//}
+
+///////////////////////// Client-side Static Files /////////////////////////
+
+app.use(express.static(vars.clientDir));
+
+///////////////////////// Listen on the port /////////////////////////
+
+app.listen(process.argv[2] || vars.port);
