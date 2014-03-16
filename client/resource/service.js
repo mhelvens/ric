@@ -105,6 +105,16 @@ define(['app/module', 'lodash'], function (Ric, _) {
 		};
 
 		result.removeMetadata = function (id, type, eid) {
+			id = id.replace(/\?/g, '%3F');
+			id = id.replace(/\#/g, '%23');
+			id = id.replace(/\//g, '%2F');
+			type = type.replace(/\?/g, '%3F');
+			type = type.replace(/\#/g, '%23');
+			type = type.replace(/\//g, '%2F');
+			eid = eid.replace(/\?/g, '%3F');
+			eid = eid.replace(/\#/g, '%23');
+			eid = eid.replace(/\//g, '%2F');
+
 			return $http.delete('/resources/entities/' + id + '/externals/' + type + '/' + eid);
 		};
 
