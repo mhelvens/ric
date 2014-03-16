@@ -1,4 +1,44 @@
 //noinspection CssUnknownTarget
+
 @import "compass";
 @import "bootstrap";
 @import "base";
+
+////////////////////////////////////////////////////////////////////////////////
+
+html, body {
+	position   : absolute;
+	min-height : 100% !important;
+	min-width  : 100% !important;
+	padding    : 0 !important;
+	margin     : 0 !important;
+	border     : 0 !important;
+
+	.ric-top-nav {
+		@include edge-to-edge;
+		height  : $ric-top-nav-height;
+		z-index : 999;
+	}
+
+	.ric-side-nav {
+		@include edge-to-edge;
+		padding-right : $ric-spacing;
+		top           : $ric-top-nav-height;
+		width         : $ric-side-nav-width + $ric-spacing;
+		z-index       : 999;
+	}
+
+	main {
+		@include edge-to-edge;
+		left   : $ric-spacing + $ric-side-nav-width;
+		top    : $ric-spacing + $ric-top-nav-height;
+		right  : $ric-spacing;
+		bottom : $ric-spacing;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+@import "partial/main/view";
+@import "partial/top-nav/view";
+@import "partial/side-nav/view";

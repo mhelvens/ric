@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>ApiNATOMY</title>
+	<title>BioMaps - Ric</title>
 
 	<script data-main="/main.js" src="/lib/requirejs/require.js"></script>
 
@@ -13,15 +13,13 @@
 </head>
 <body>
 
+	<ric-top-nav id="top-nav"></ric-top-nav>
 
-	<!--<ric-top-nav id="top-nav"></ric-top-nav>-->
+	<ric-side-nav id="side-nav"></ric-side-nav>
 
-
-	<!--<ric-side-nav id="side-nav"></ric-side-nav>-->
-
-
-	<main ng-view></main>
-
+	<main>
+		<ric-interface></ric-interface>
+	</main>
 
 </body>
 </html>

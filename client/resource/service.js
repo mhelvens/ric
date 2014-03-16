@@ -5,42 +5,80 @@ define(['app/module', 'lodash'], function (Ric, _) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	Ric.factory('ResourceService', ['$resource', '$q', function ($resource, $q) {
+	function FN(Res, action) {
+		return function (options) {
+			if (options && _(options.ids).isArray()) {
+				options.ids =  options.ids.join(',');
+			}
+			return Res[action](options || {}).$promise;
+		};
+	}
 
-		var Structures = $resource('/resources/structures/:uris', undefined, {
-			'get': { method: 'GET', isArray: true }
+	function getField(field) {
+		return function (obj) {
+			return obj[field];
+		}
+	}
+
+	Ric.factory('Resources', ['$resource', '$http', function ($resource, $http) {
+
+		//// create $resource classes
+
+		var Entities = $resource('/resources/entities/:ids?skip=:skip&limit=:limit', undefined, {
+			'get':         { method: 'GET', isArray: true },
+			'getAll':      { method: 'GET', isArray: true, url: '/resources/entities?skip=:skip&limit=:limit' },
+			'getCount':    { method: 'GET', isArray: false, url: '/resources/entities/count' }
 		});
 
-		var structureCache = {};
+		var Connections = $resource('/resources/connections/:ids?skip=:skip&limit=:limit', undefined, {
+			'get':      { method: 'GET', isArray: true },
+			'getAll':   { method: 'GET', isArray: true, url: '/resources/connections?skip=:skip&limit=:limit' },
+			'getCount': { method: 'GET', isArray: false, url: '/resources/connections/count' }
+		});
 
-		return {
-			structures: function (uris) {
-				var dResult = $q.defer();
+//		var Externals = $resource('/resources/externals/:ids?skip=:skip&limit=:limit', undefined, {
+//			'get':      { method: 'GET', isArray: true },
+//			'getAll':   { method: 'GET', isArray: true, url: '/resources/externals?skip=:skip&limit=:limit' },
+//			'getCount': { method: 'GET', isArray: false, url: '/resources/externals/count' }
+//		});
 
-				if (!_(uris).isArray() || _(uris).isEmpty()) {
-					dResult.resolve([]);
-				} else {
-					var result = _(structureCache).at(uris).compact().values().value();
-					var request = _(uris).difference(_(structureCache).keys().value()).value();
 
-					if (_(request).isEmpty()) {
-						dResult.resolve(result);
-					} else {
-						Structures.get({ uris: request.join(',') },
-								function getSuccess(value, responseHeaders) {
-									_(structureCache).assign(_(value).pluck('uri').zipObject(value).value());
-									result.push.apply(result, _(value).toArray().value());
-									dResult.resolve(result);
-								}, function getError(httpResponse) {
-									dResult.reject(httpResponse);
-								});
-					}
-				}
+		//// build interface
 
-				return dResult.promise;
-			}
+		var result = {};
+
+		result.entities       = FN(Entities, 'get');
+		result.entities.all   = FN(Entities, 'getAll');
+		result.entities.count = function () {
+			return FN(Entities, 'getCount')().then(getField('count'));
 		};
 
+		result.connections       = FN(Connections, 'get');
+		result.connections.all   = FN(Connections, 'getAll');
+		result.connections.count = function () {
+			return FN(Connections, 'getCount')().then(getField('count'));
+		};
+
+//		result.externals       = FN(Externals, 'get');
+//		result.externals.all   = FN(Externals, 'getAll');
+//		result.externals.count = function () {
+//			return FN(Externals, 'getCount')().then(getField('count'));
+//		};
+
+		result.metadataRelTypes = function () {
+			// not sure why, but the $resources way returns the strings as objects...
+			return $http.get('/resources/reltypes').then(getField('data'));
+		};
+
+		result.addMetadata = function (id, metadata) {
+			return $http.post('/resources/entities/' + id + '/externals', metadata).then(getField('data'));
+		};
+
+		result.removeMetadata = function (id, type, eid) {
+			return $http.delete('/resources/entities/' + id + '/externals/' + type + '/' + eid);
+		};
+
+		return result;
 	}]);
 
 

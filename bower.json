@@ -31,6 +31,11 @@
     "angular-animate": "~1.2.12",
     "jquery": "~2.1.0",
     "lodash": "~2.4.1",
-    "ng-grid": "~2.0.7"
+    "ng-grid": "~2.0.7",
+    "require-css": "~0.1.2",
+    "bg-splitter": "*",
+    "spin.js": "~2.0.0",
+    "angular-dragdrop": "~1.0.6",
+    "jquery-ui": "~1.10.4"
   }
 }

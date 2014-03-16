@@ -1,0 +1,10 @@
+<nav class="ric-side-nav" role="navigation">
+
+	<header><h2>Ric</h2></header>
+
+	<ric-entity-details
+			ng-repeat="uriId in FocusService.uriIdRange()"
+			ng-show="uriId < FocusService.uriCount()"
+			uri="FocusService.uri(uriId)"></ric-entity-details>
+
+</nav>

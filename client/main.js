@@ -14,15 +14,19 @@ requirejs.config({
 		'es6-shim':          'lib/es6-shim/es6-shim',
 		'domReady':          'lib/requirejs-domready/domReady',
 		'jquery':            'lib/jquery/dist/jquery',
+		'jquery-ui':         'lib/jquery-ui/ui/jquery-ui',
 		'lodash':            'lib/lodash/dist/lodash',
 		'angular':           'lib/angular/angular',
 		'angular-resource':  'lib/angular-resource/angular-resource',
 		'angular-route':     'lib/angular-route/angular-route',
 		'angular-animate':   'lib/angular-animate/angular-animate',
 		'angular-bootstrap': 'lib/angular-bootstrap/ui-bootstrap-tpls',
-		'angular-recursion': 'lib/angular-recursion/angular-recursion',
+		'angular-dragdrop':  'lib/angular-dragdrop/src/angular-dragdrop',
 		'ng-grid':           'lib/ng-grid/build/ng-grid',
-		'chroma':            'lib/chroma-js/chroma'
+		'bg-splitter':       'lib/bg-splitter/js/splitter',
+		'chroma':            'lib/chroma-js/chroma',
+		'spin':              'lib/spin.js/spin',
+		'jquery-spin':       'lib/spin.js/jquery.spin'
 	},
 	shim:  {
 		'angular':           { exports: 'angular', deps: ['jquery'] },
@@ -33,8 +37,13 @@ requirejs.config({
 		'angular-route':     ['angular'],
 		'angular-animate':   ['angular'],
 		'angular-bootstrap': ['angular'],
-		'angular-recursion': ['angular'],
-		'ng-grid':           ['angular']
+		'bg-splitter':       ['angular'],
+		'ng-grid':           ['angular', 'jquery'],
+		'angular-dragdrop':  ['angular', 'jquery-ui'],
+		'jquery-ui':         ['jquery']
+	},
+	map:   {
+		'*': { 'css': 'lib/require-css/css' }
 	}
 });
 

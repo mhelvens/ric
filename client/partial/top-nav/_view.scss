@@ -1,0 +1,40 @@
+@import "base";
+
+.ric-top-nav {
+
+	.form-control + .input-group-btn > button {
+		// to fix 1 pixel height difference
+		height : $input-height-base;
+	}
+
+	.ric-brand {
+		span:first-child {
+			vertical-align : top;
+			margin-right   : 10px;
+		}
+		span:nth-child(2) {
+			vertical-align : top;
+		}
+	}
+
+	button {
+		input[type="checkbox"] {
+			margin       : 0px;
+			margin-right : 3px;
+		}
+		label {
+			margin : 0px;
+		}
+	}
+
+	.ric-account-button {
+		span:first-child {
+			vertical-align : -1pt;
+			margin-right   : 5px;
+		}
+		span:nth-child(2) {
+			font-weight : bold;
+		}
+	}
+
+}

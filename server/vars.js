@@ -7,4 +7,4 @@ exports.rootDir = path.resolve(__dirname + '/..');
 exports.clientDir = exports.rootDir + '/client';
 exports.serverDir  = exports.rootDir + '/server';
 exports.dbServer = 'localhost';
-exports.dbCollection = 'ric';
+exports.dbName = 'ric';

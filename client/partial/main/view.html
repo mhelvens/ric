@@ -1,0 +1,150 @@
+<bg-splitter orientation="vertical" on-resize="onResizeAll()">
+	<bg-pane>
+		<bg-splitter orientation="horizontal" on-resize="onResizeTop()">
+			<bg-pane>
+
+				<div class="panel panel-default">
+					<div class="panel-heading"><h3>
+						<span class="glyphicon glyphicon-heart" style="float: right"></span>
+						Anatomical Entities
+					</h3></div>
+					<div class="panel-body">
+						<div ng-hide="entitiesBusy" class="ric-entities-grid" ng-grid="entityGrid"></div>
+						<div ng-show="entitiesBusy" class="spinner"></div>
+					</div>
+				</div>
+
+			</bg-pane>
+			<bg-pane>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3>
+							<span class="glyphicon glyphicon-transfer" style="float: right"></span>
+							Connections / Communications
+						</h3>
+					</div>
+					<div class="panel-body">
+						<div ng-hide="connectionsBusy" class="ric-connections-grid" ng-grid="connectionGrid"></div>
+						<div ng-show="connectionsBusy" class="spinner"></div>
+					</div>
+				</div>
+
+			</bg-pane>
+		</bg-splitter>
+	</bg-pane>
+	<bg-pane>
+		<bg-splitter orientation="horizontal" on-resize="onResizeBottom()">
+			<bg-pane>
+
+				<div class="panel panel-default" ng-if="selected && selectedType === 'entity'">
+					<div class="panel-heading"><h3>Entity: "{{ selected.name }}"</h3></div>
+					<div class="panel-body details-panel">
+						<table>
+							<tbody>
+							<tr>
+								<th><label for="selected._id">URI</label></th>
+								<td><input id="selected._id" class="form-control" disabled="disabled" type="text"
+								           ng-model="selected._id"></td>
+							</tr>
+							<tr>
+								<th><label for="selected.name">Name</label></th>
+								<td><input id="selected.name" class="form-control" disabled="disabled" type="text" ng-model="selected.name">
+								</td>
+							</tr>
+							<tr>
+								<th><label for="selected.description">Description</label></th>
+								<td><input id="selected.description" class="form-control" disabled="disabled" type="text"
+								           ng-model="selected.description"></td>
+							</tr>
+							<tr>
+								<th>Metadata</th>
+								<td>
+									<div class="well well-sm ric-metadata-drop-area"
+									     style="background-color: white; margin: 0; padding: 0;"
+									     data-drop="true">
+										<div style="padding: 1px 0 3px 5px; line-height: 26px;">
+											<span ng-repeat-start="metadata in selected.externals"
+											      class="label label-default">
+												<span style="font-weight: normal;">{{ metadata.external.name }}</span>
+												&nbsp;
+												<span>{{ metadata.type }}</span>
+												&nbsp;
+												<span style="font-weight: normal;">this</span>
+												&nbsp;
+												<span ng-click="removeMetadata(selected, metadata)"
+												      class="glyphicon glyphicon-remove"
+												      style="color: #fcc; cursor: pointer; margin-right: -4px;"></span>
+											</span><span ng-repeat-end>&nbsp;</span>
+											<span ng-if="selected.externals.length === 0">&nbsp;</span>
+										</div>
+										<div style="border-top: dotted 1px lightgray; margin: 0; padding: 1px 4px 3px 4px;">
+											<label ng-repeat="relType in relTypes"
+											       class="radio-inline"
+											       style="display: inline-block; margin-left: 0; margin-right: 10px;">
+												<input type="radio"
+												       name="meta-relation-type"
+												       ng-model="mainScope.currentRelType"
+												       value="{{ relType }}">
+												{{ relType }}
+											</label>
+											<label class="radio-inline"
+											       style="display: inline-block; margin-left: 0;">
+												<input type="radio"
+												       name="meta-relation-type"
+												       ng-model="mainScope.currentRelType"
+												       ng-value="mainScope.currentCustomRelType">
+												<input type="text"
+												       class="form-control"
+												       ng-model="mainScope.currentCustomRelType"
+												       placeholder="new relation..."
+												       ng-change="mainScope.currentRelType = mainScope.currentCustomRelType"
+												       style="padding: 2px 1px 2px 1px; height: 18px; font-size: 12px;">
+											</label>
+										</div>
+									</div>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="panel panel-default" ng-if="selected && selectedType === 'connection'">
+					<div class="panel-heading"><h3>Connection: {{ selected.name }}</h3></div>
+					<div class="panel-body">
+						(Details of one connection)
+					</div>
+				</div>
+
+				<div class="panel panel-default" ng-if="!selected">
+					<p style="font-family: serif; font-size: 20pt; margin-top: auto; margin-bottom: auto; text-align: center; vertical-align: middle;">
+						Select an entity or connection from<br>
+						above to edit its details here...
+					</p>
+				</div>
+
+			</bg-pane>
+			<bg-pane>
+
+				<div class="panel panel-default">
+					<div class="panel-heading"><h3>
+						<span class="glyphicon glyphicon-pushpin" style="float: right"></span>
+						External Resources
+					</h3></div>
+					<div class="panel-body external-resources-body">
+						<div ng-hide="externalBusy" class="ric-externals-grid" ng-grid="externalGrid"></div>
+						<div ng-show="externalBusy" class="spinner"></div>
+						<div class="file-interface">
+							<input class="file-import" type="file" style="display: none">
+							<button class="btn btn-success" ng-click="importExternals()">Import</button>
+							<button class="btn btn-danger" ng-click="clearExternals()">Clear</button>
+							<a download="metadata.txt" href="/metadata.txt" class="btn btn-default" style="float: right;">Export Metadata</a>
+						</div>
+					</div>
+				</div>
+
+			</bg-pane>
+		</bg-splitter>
+	</bg-pane>
+</bg-splitter>

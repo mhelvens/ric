@@ -1,0 +1,35 @@
+@import "base";
+
+.ric-side-nav {
+
+	background-color : rgba(255, 255, 255, .5);
+
+	& > header {
+		margin-top    : $ric-spacing;
+		margin-bottom : $ric-spacing;
+		padding       : 0px;
+		border-style  : none none solid none;
+		border-width  : 2px;
+		border-color  : lightgray;
+
+		& > h2 {
+			text-align    : right;
+			padding-right : $ric-spacing;
+			font-size     : 18pt;
+			font-family   : serif;
+			font-weight   : bold;
+			margin-top    : 0;
+			margin-bottom : -4px;
+		}
+
+	}
+
+	& > .ric-entity-details {
+		@include fade-out;
+		margin-left   : $ric-spacing;
+		margin-bottom : $ric-spacing;
+	}
+
+}
+
+@import "partial/side-nav/details/view";

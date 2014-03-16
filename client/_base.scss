@@ -1,5 +1,9 @@
 ///////////////////////// Variables /////////////////////////
 
+$ric-spacing : 15px;
+$ric-top-nav-height : $navbar-height;
+$ric-panel-height: 47px;
+$ric-side-nav-width : 200px;
 
 
 ///////////////////////// Mixins /////////////////////////
@@ -15,18 +19,30 @@
 	padding  : 0;
 }
 
+///////////////////////// Visual drag-handle /////////////////////////
+
+@mixin drag-handle($width, $height) {
+	@include user-select(none);
+	display        : inline-block;
+	cursor         : move;
+	margin         : 0;
+	padding        : 0;
+	height         : $height * 5px;
+	width          : $width * 5px;
+	background     : url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHUlEQVQIW2NkwAIYQWJnzpz5D5MzMTFhJFEQ3VgAka4MBizpv8cAAAAASUVORK5CYII=) repeat;
+}
+
 
 ///////////////////////// Fade-in & Fade-out /////////////////////////
 
-@mixin -fade-in-out-transition($duration: 600ms) {
+@mixin -fade-in-out-transition($duration : 600ms) {
 	&.ng-hide-add, &.ng-hide-remove {
 		@include single-transition(opacity, linear, $duration);
 		display : block !important;
 	}
 }
 
-
-@mixin fade-out($duration: 600ms) {
+@mixin fade-out($duration : 600ms) {
 	@include -fade-in-out-transition($duration);
 	&.ng-hide-add.ng-hide-add-active {
 		opacity : 0;
@@ -36,7 +52,7 @@
 	}
 }
 
-@mixin fade-in($duration: 600ms) {
+@mixin fade-in($duration : 600ms) {
 	@include -fade-in-out-transition($duration);
 	&.ng-hide-remove.ng-hide-remove-active {
 		opacity : 0;
@@ -46,7 +62,7 @@
 	}
 }
 
-@mixin fade-in-out($duration: 600ms) {
+@mixin fade-in-out($duration : 600ms) {
 	@include fade-out($duration);
-	@include fade-in ($duration);
+	@include fade-in($duration);
 }
