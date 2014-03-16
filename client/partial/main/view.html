@@ -8,9 +8,20 @@
 						<span class="glyphicon glyphicon-heart" style="float: right"></span>
 						Anatomical Entities
 					</h3></div>
-					<div class="panel-body">
-						<div ng-hide="entitiesBusy" class="ric-entities-grid" ng-grid="entityGrid"></div>
-						<div ng-show="entitiesBusy" class="spinner"></div>
+					<div class="entities-panel-body panel-body"
+					     ng-class="{ 'all-entities-loaded': 0 < entities.length && entities.length === totalEntityCount }">
+						<div ng-hide="entitiesBusy"
+						     class="ric-entities-grid"
+						     ng-grid="entityGrid"></div>
+						<div class="entities-progressbar progress progress-striped active">
+							<div class="progress-bar" role="progressbar"
+							     aria-valuemin="0"
+							     aria-valuenow="{{ entities.length }}"
+							     aria-valuemax="{{ totalEntityCount }}"
+							     style="width: {{ 100 * entities.length / totalEntityCount }}%">
+								{{ entities.length }} / {{ totalEntityCount }}
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -26,7 +37,6 @@
 					</div>
 					<div class="panel-body">
 						<div ng-hide="connectionsBusy" class="ric-connections-grid" ng-grid="connectionGrid"></div>
-						<div ng-show="connectionsBusy" class="spinner"></div>
 					</div>
 				</div>
 
@@ -134,12 +144,11 @@
 					</h3></div>
 					<div class="panel-body external-resources-body">
 						<div ng-hide="externalBusy" class="ric-externals-grid" ng-grid="externalGrid"></div>
-						<div ng-show="externalBusy" class="spinner"></div>
 						<div class="file-interface">
-							<input class="file-import" type="file" style="display: none">
-							<button class="btn btn-success" ng-click="importExternals()">Import</button>
-							<button class="btn btn-danger" ng-click="clearExternals()">Clear</button>
-							<a download="metadata.txt" href="/metadata.txt" class="btn btn-default" style="float: right;">Export Metadata</a>
+							<input  ng-disabled="!(0 < entities.length && entities.length === totalEntityCount)" class="file-import" type="file" style="display: none">
+							<button ng-disabled="!(0 < entities.length && entities.length === totalEntityCount)" class="btn btn-success" ng-click="importExternals()">Import</button>
+							<button ng-disabled="!(0 < entities.length && entities.length === totalEntityCount)" class="btn btn-danger" ng-click="clearExternals()">Clear</button>
+							<a ng-disabled="!(0 < entities.length && entities.length === totalEntityCount)" download="metadata.txt" href="/metadata.txt" class="btn btn-default" style="float: right;">Export Metadata</a>
 						</div>
 					</div>
 				</div>

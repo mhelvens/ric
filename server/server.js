@@ -97,6 +97,7 @@ app.get('/resources/entities/:ids', function (req, res) {
 	var limit = req.query.limit || Infinity;
 	db.Entity.find()
 			.where('_id').in(ids)
+			.sort({ '_id': 1 })
 			.skip(skip)
 			.limit(limit)
 			.populate('sub.entity', '_id')
@@ -117,6 +118,7 @@ app.get('/resources/entities', function (req, res) {
 	var skip = req.query.skip || 0;
 	var limit = req.query.limit || Infinity;
 	db.Entity.find()
+			.sort({ '_id': 1 })
 			.skip(skip)
 			.limit(limit)
 //			.populate('sub.entity', '_id') // not yet necessary at this stage

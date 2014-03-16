@@ -5,6 +5,9 @@ define(['app/module', 'lodash'], function (Ric, _) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+	var SERVER_REQUEST_SIZE = 500; // entities per request
+
+
 	function FN(Res, action) {
 		return function (options) {
 			if (options && _(options.ids).isArray()) {
@@ -20,7 +23,7 @@ define(['app/module', 'lodash'], function (Ric, _) {
 		}
 	}
 
-	Ric.factory('Resources', ['$resource', '$http', function ($resource, $http) {
+	Ric.factory('Resources', ['$resource', '$http', '$q', function ($resource, $http, $q) {
 
 		//// create $resource classes
 
@@ -53,17 +56,44 @@ define(['app/module', 'lodash'], function (Ric, _) {
 			return FN(Entities, 'getCount')().then(getField('count'));
 		};
 
+
+		result.entities.progressively = function () {
+			var entitiesPromise = $q.defer();
+
+			result.entities.count().then(function (totalCount) {
+				console.log('Entity count from server:', totalCount);
+
+				var entities = [];
+
+				entitiesPromise.notify({ entities: entities, totalCount: totalCount });
+
+				(function loadEntities(skip) {
+					result.entities.all({ skip: skip, limit: SERVER_REQUEST_SIZE }).then(function (newEntities) {
+						console.log('Fetching entities from server:', skip, 'to', skip + SERVER_REQUEST_SIZE);
+						entities = entities.concat(newEntities);
+						entitiesPromise.notify({ entities: entities, totalCount: totalCount });
+						if (entities.length < totalCount) {
+							loadEntities(skip + SERVER_REQUEST_SIZE);
+						} else {
+							entitiesPromise.resolve({ entities: entities, totalCount: totalCount });
+						}
+					}, function (err) {
+						entitiesPromise.reject(err);
+					});
+				})(0);
+			}, function (err) {
+				entitiesPromise.reject(err);
+			});
+
+			return entitiesPromise.promise;
+		};
+
+
 		result.connections       = FN(Connections, 'get');
 		result.connections.all   = FN(Connections, 'getAll');
 		result.connections.count = function () {
 			return FN(Connections, 'getCount')().then(getField('count'));
 		};
-
-//		result.externals       = FN(Externals, 'get');
-//		result.externals.all   = FN(Externals, 'getAll');
-//		result.externals.count = function () {
-//			return FN(Externals, 'getCount')().then(getField('count'));
-//		};
 
 		result.metadataRelTypes = function () {
 			// not sure why, but the $resources way returns the strings as objects...

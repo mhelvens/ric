@@ -5,7 +5,6 @@ define(['jquery',
         'app/module',
         'resource/service',
         'bg-splitter',
-        'jquery-spin',
         '$bind/service',
         'css!lib/bg-splitter/css/style'], function ($, Ric) {
 //  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,14 +15,13 @@ define(['jquery',
 	var GRID_ROW_HEIGHT = 30; // px
 
 	var DEFAULT_INITIAL_GRID_OPTIONS = {
-		headerRowHeight:   GRID_ROW_HEIGHT,
-		rowHeight:         GRID_ROW_HEIGHT,
-		multiSelect:       false,
-		enablePaging:      false,
-		showColumnMenu:    true,
-		showFooter:        false,
-		jqueryUIDraggable: true,
-		selectedItems: []
+		headerRowHeight: GRID_ROW_HEIGHT,
+		rowHeight:       GRID_ROW_HEIGHT,
+		multiSelect:     false,
+		enablePaging:    false,
+		showColumnMenu:  true,
+		showFooter:      false,
+		selectedItems:   []
 	};
 
 	Ric.directive('ricInterface', ['Resources', '$timeout', '$bind', function (Resources, $timeout, $bind) {
@@ -37,7 +35,7 @@ define(['jquery',
 
 				$scope._ = _;
 
-				$scope.nocacheTimestamp = _.now();
+				$scope.totalEntityCount = 0;
 
 				//// metadata relation types
 
@@ -123,21 +121,24 @@ define(['jquery',
 				//// Grid options
 
 				$scope.entityGrid = _.defaults({
-					data:          'entities',
-					rowTemplate:   'partial/main/entityRow.html',
-					columnDefs:    [
+					data:        'entities',
+					rowTemplate: 'partial/main/entityRow.html',
+					columnDefs:  [
 //						{ width: 30, cellHeaderTemplate: "", cellTemplate: 'partial/main/drag-handle-cell.html' },
 						{ field: '_id', displayName: 'URI', width: 160 },
 						{ field: 'name', displayName: 'Name', enableCellEdit: true },
-						{ field: 'description', displayName: 'Description', enableCellEdit: true, visible: false }
+						{ field: 'description', displayName: 'Description', enableCellEdit: false, visible: false }
 					],
-					showFilter:    true
+					showFilter:     true,
+					showColumnMenu: true,
+					enableSorting:  true,
+					enableCellEdit: true
 				}, _.cloneDeep(DEFAULT_INITIAL_GRID_OPTIONS));
 
 				$scope.connectionGrid = _.defaults({
-					data:          'connections',
-					rowTemplate:   'partial/main/connectionRow.html',
-					columnDefs:    [
+					data:        'connections',
+					rowTemplate: 'partial/main/connectionRow.html',
+					columnDefs:  [
 //						{ width: 30, cellHeaderTemplate: "", cellTemplate: 'partial/main/drag-handle-cell.html' },
 						{ field: 'type', displayName: 'Type' },
 						{ field: 'from', displayName: 'From' },
@@ -159,87 +160,30 @@ define(['jquery',
 
 				//// Fetch initial entities and connections
 
-				$scope.entitiesBusy = true;
-				$scope.connectionsBusy = true;
-				$scope.externalsBusy = true;
+				Resources.entities.progressively().then(function (data) {
+					$scope.entities = data.entities;
+					$scope.totalEntityCount = data.totalCount;
+				}, function (err) {
+					console.error(err);
+				}, function (data) {
+					$scope.entities = data.entities;
+					$scope.totalEntityCount = data.totalCount;
+				});
 
-				(function loadEntities(skip) {
-					Resources.entities.all({ skip: skip, limit: SERVER_REQUEST_SIZE }).then(function (entities) {
-						console.log('Fetching entities from server:', skip, 'to', skip + SERVER_REQUEST_SIZE);
-						$scope.entitiesBusy = false;
-						$scope.entities = $scope.entities.concat(entities);
-						if (entities.length === SERVER_REQUEST_SIZE) {
-							loadEntities(skip + SERVER_REQUEST_SIZE);
-						} else {
-							// TODO: remove remaining loading indicators
-						}
-					});
-				})(0);
 
 				(function loadConnections(skip) {
 					Resources.connections.all({ skip: 0, limit: SERVER_REQUEST_SIZE }).then(function (connections) {
 						console.log('Fetching connections from server:', skip, 'to', skip + SERVER_REQUEST_SIZE);
-						$scope.connectionsBusy = false;
 						$scope.connections = $scope.connections.concat(connections);
 						if (connections.length === SERVER_REQUEST_SIZE) {
 							loadConnections(skip + SERVER_REQUEST_SIZE);
-						} else {
-							// TODO: remove remaining loading indicators
 						}
 					});
 				})(0);
 
-//				(function loadExternals(skip) {
-//					Resources.externals.all({ skip: 0, limit: SERVER_REQUEST_SIZE }).then(function (externals) {
-//						console.log('Fetching externals from server:', skip, 'to', skip + SERVER_REQUEST_SIZE);
-//						$scope.externalsBusy = false;
-//						$scope.externals = $scope.externals.concat(externals);
-//						if (externals.length === SERVER_REQUEST_SIZE) {
-//							loadExternals(skip + SERVER_REQUEST_SIZE);
-//						} else {
-//							// TODO: remove remaining loading indicators
-//						}
-//					});
-//				})(0);
-
 			}],
 
 			link: function ($scope, iElement) {
-
-
-//				jqyoui-droppable="entityMetadataJqyouiDroppable"
-//				jqyoui-options="entityMetadataJqyouiOptions"
-
-
-				//// Busy & progress indicators
-
-				$scope.$watch('entitiesBusy', function (busy) {
-					if (busy) {
-						iElement.find('.ric-entities-grid + .spinner').spin();
-					} else {
-						iElement.find('.ric-entities-grid + .spinner').data('spinner').stop();
-						iElement.find('.ric-entities-grid').trigger('resize');
-					}
-				});
-
-				$scope.$watch('connectionsBusy', function (busy) {
-					if (busy) {
-						iElement.find('.ric-connections-grid + .spinner').spin();
-					} else {
-						iElement.find('.ric-connections-grid + .spinner').data('spinner').stop();
-						iElement.find('.ric-connections-grid').trigger('resize');
-					}
-				});
-
-				$scope.$watch('externalsBusy', function (busy) {
-					if (busy) {
-						iElement.find('.ric-externals-grid + .spinner').spin();
-					} else {
-						iElement.find('.ric-externals-grid + .spinner').data('spinner').stop();
-						iElement.find('.ric-externals-grid').trigger('resize');
-					}
-				});
-
 
 				//// trigger proper resize events when panes resize
 
@@ -256,6 +200,13 @@ define(['jquery',
 				$scope.onResizeBottom = function onResizeBottom() {
 					iElement.find('.ric-externals-grid').trigger('resize');
 				};
+
+
+				//// block controls while loading
+
+				$scope.$watch('0 < entities.length && entities.length === totalEntityCount', function () {
+					iElement.find('.ric-entities-grid').trigger('resize');
+				});
 
 
 				//// Switching between entity view and connection view
