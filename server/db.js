@@ -76,6 +76,13 @@ var entitySchema = new mongoose.Schema({
 }, { _id: false });
 entitySchema.index({ externals: 1 });
 
+var unitSchema = new mongoose.Schema({
+	_id:         StringType({ unique: true }),
+	name:        StringType(),
+	description: StringType(),
+	externals:   [subExternalSchema]
+}, { _id: false });
+
 var connectionSchema = new mongoose.Schema({
 	from: EntityReference(),
 	to:   EntityReference(),
@@ -85,7 +92,7 @@ connectionSchema.index({ from: 1, to: 1 }, { unique: true });
 connectionSchema.index({ type: 1 });
 
 var metadataSchema = new mongoose.Schema({
-	entity: EntityReference(),
+	entity: StringType(),
 	type:   StringType(),
 	eid:    StringType(),
 	name:   StringType()
@@ -105,5 +112,6 @@ metadataSchema.index({ entity: 1, type: 1, eid: 1 }, { unique: true });
 ////////////////////////////////////////////////////////////////////////////////
 
 exports.Entity = mongoose.model('Entity', entitySchema);
+exports.Unit = mongoose.model('Unit', unitSchema);
 exports.Connection = mongoose.model('Connection', connectionSchema);
 exports.Metadata = mongoose.model('Metadata', metadataSchema);

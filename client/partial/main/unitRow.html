@@ -1,0 +1,19 @@
+<div style="height: 100%;"
+     data-drag="true"
+     jqyoui-draggable="unitJqyouiDraggable"
+     jqyoui-options="unitJqyouiOptions"
+     class="draggable">
+
+	<div ng-repeat="col in renderedColumns"
+	     ng-style="{ cursor: row.cursor, width: col.width }"
+	     ng-class="col.colIndex()"
+	     class="ngCell {{ columnClass($index) }} {{ col.cellClass }}">
+
+		<div class="ngVerticalBar"
+		     ng-style="{ height: rowHeight }"
+		     ng-class="{ ngVerticalBarVisible: !$last }">&nbsp;</div>
+		<div ng-cell></div>
+
+	</div>
+
+</div>

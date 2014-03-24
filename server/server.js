@@ -268,6 +268,209 @@ app.delete('/resources/entities/:id/externals/:type/:eid', function (req, res) {
 });
 
 
+
+
+/////////////////  //  //  /  /  /
+///// Units ////  //  //  /  /  /
+///////////////  //  //  /  /  /
+
+
+//// GET count of units
+
+app.get('/resources/units/count', function (req, res) {
+	db.Unit.count({}, function (err, count) {
+		if (err) {
+			console.log(err);
+			res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+			return;
+		}
+		res.status(HTTP_OK).json({ count: count });
+	});
+});
+
+
+//// GET specific set of units
+
+app.get('/resources/units/:ids', function (req, res) {
+	var ids = req.params.ids.split(',');
+	var skip = req.query.skip || 0;
+	var limit = req.query.limit || Infinity;
+	db.Unit.find()
+			.where('_id').in(ids)
+			.sort({ '_id': 1 })
+			.skip(skip)
+			.limit(limit)
+			.exec(function (err, ents) {
+				if (err) {
+					console.log(err);
+					res.status(HTTP_INTERNAL_SERVER_ERROR).send(null);
+					return;
+				}
+				res.status(HTTP_OK).json(ents);
+			});
+});
+
+
+//// GET all units
+
+app.get('/resources/units', function (req, res) {
+	var skip = req.query.skip || 0;
+	var limit = req.query.limit || Infinity;
+	db.Unit.find()
+			.sort({ '_id': 1 })
+			.skip(skip)
+			.limit(limit)
+			.exec(function (err, ents) {
+				if (err) {
+					console.log(err);
+					res.status(HTTP_INTERNAL_SERVER_ERROR).send(null);
+				}
+				res.status(HTTP_OK).json(ents);
+			});
+});
+
+
+//// POST new unit
+
+app.post('/resources/units', function (req, res) {
+	if (_(req.body._id).isUndefined()) {
+		res.status(HTTP_BAD_REQUEST).send(null);
+		return;
+	}
+
+	var newUnit = new db.Unit(_.pick(req.body, ['name', 'description']));
+
+	newUnit.save(function (err, unit) {
+		if (err) {
+			console.log(err);
+			res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+			return;
+		}
+		res.status(HTTP_CREATED).json(unit);
+	});
+});
+
+
+//// PUT edit of existing unit
+
+app.put('/resources/units/:id', function (req, res) {
+	db.Unit.findById(req.params.id, function (err, unit) {
+		if (err) {
+			res.status(HTTP_NOT_FOUND).json(err);
+			return;
+		}
+
+		_.assign(unit, _.pick(req.body, ['name', 'description']));
+
+		unit.save(function (err) {
+			if (err) {
+				console.log(err);
+				res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+				return;
+			}
+			res.status(HTTP_OK).json(unit);
+		});
+
+	});
+});
+
+
+//// POST new meta-data onto existing unit
+
+app.post('/resources/units/:id/externals', function (req, res) {
+
+	//// add the new metadata to the unit itself first
+
+	db.Unit.update({ _id: req.params.id }, { $push: { externals: req.body } }, function (err) {
+		if (err) {
+			res.status(HTTP_NOT_FOUND).json(err);
+			return;
+		}
+
+		//// add it to the metadata collection too, to get quick access when needed
+
+		var newMeta = new db.Metadata({
+			entity: req.params.id, // this key is still called 'entity'
+			type:   req.body.type,
+			eid:    req.body.external._id,
+			name:   req.body.external.name
+		});
+
+		newMeta.save(function (err, meta) {
+			if (err) {
+				console.log(err);
+				res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+				return;
+			}
+
+			//// and send the response
+
+			res.status(HTTP_CREATED).json(req.body);
+		});
+	});
+});
+
+
+//// DELETE existing unit
+
+app.delete('/resources/units/:id', function (req, res) {
+
+	// TODO: use dedicated method 'findByIdAndRemove'
+
+	db.Unit.findById(req.params.id, function (err, unit) {
+		if (err) {
+			console.log(err);
+			res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+			return;
+		}
+
+		unit.remove(function (err) {
+			if (err) {
+				console.log(err);
+				res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+				return;
+			}
+			res.status(HTTP_NO_CONTENT).send(null);
+		});
+	});
+});
+
+
+//// DELETE meta-data from existing unit
+
+app.delete('/resources/units/:id/externals/:type/:eid', function (req, res) {
+
+	//// remove it from the unit itself first
+
+	db.Unit.update({ _id: req.params.id }, { $pull: { externals: { type: req.params.type, external: req.params.eid } } }, function (err) {
+		if (err) {
+			console.log(err);
+			res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+			return;
+		}
+
+		//// then remove it in the metadata collection
+
+		// the key below is still called 'entity'
+		db.Metadata.findOneAndRemove({ entity: req.params.id, type: req.params.type, eid: req.params.eid }, function (err) {
+			if (err) {
+				console.log(err);
+				res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
+				return;
+			}
+
+			//// then send the response
+
+			res.status(HTTP_NO_CONTENT).send(null);
+		});
+	});
+});
+
+
+
+
+
+
 ///////////////////////  //  //  /  /  /
 ///// Connections ////  //  //  /  /  /
 /////////////////////  //  //  /  /  /
@@ -475,7 +678,7 @@ app.get('/resources/reltypes', function (req, res) {
 //// The bootstrap glyphicons need special treatment:
 
 app.get('/bootstrap/glyphicons-halflings-regular.*', function (req, res) {
-	res.redirect('/lib/bootstrap-sass-official/vendor/assets/fonts/' + req.path);
+	res.redirect('/lib/bootstrap-sass-official/vendor/assets/fonts' + req.path);
 });
 
 app.get('/require.js', function (req, res) {

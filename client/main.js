@@ -48,14 +48,14 @@ requirejs.config({
 });
 
 
-//// Monkey patch Require.js to log every module load to the console
-
-var oldReqLoad = requirejs.load;
-function reqLogLoad(context, moduleName, url) {
-	console.log("Loading:", moduleName);
-	return oldReqLoad(context, moduleName, url);
-}
-requirejs.load = reqLogLoad;
+////// Monkey patch Require.js to log every module load to the console
+//
+//var oldReqLoad = requirejs.load;
+//function reqLogLoad(context, moduleName, url) {
+//	console.log("Loading:", moduleName);
+//	return oldReqLoad(context, moduleName, url);
+//}
+//requirejs.load = reqLogLoad;
 
 
 //// Utility modules to load up front

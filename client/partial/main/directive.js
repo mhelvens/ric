@@ -35,8 +35,6 @@ define(['jquery',
 
 				$scope._ = _;
 
-				$scope.totalEntityCount = 0;
-
 				//// metadata relation types
 
 				$scope.relTypes = [];
@@ -51,17 +49,39 @@ define(['jquery',
 				//// DB Elements
 
 				$scope.entities = [];
+				$scope.units = [];
 				$scope.connections = [];
 				$scope.externals = [];
 
+				$scope.totalEntityCount = 0;
+				$scope.totalUnitCount = 0;
+
 				$scope.entitiesDoneLoading = false;
+				$scope.unitsDoneLoading = false;
 				$scope.connectionsDoneLoading = false;
 				$scope.externalsDoneLoading = false;
+
+
+				//// Panels
+
+				$scope.panels = {
+					anatomical: {
+						name: "Anatomical Entities"
+					},
+					units: {
+						name: "Units"
+					}
+				};
+
+				$scope.activePanels = {
+					main: $scope.panels.anatomical
+				};
 
 
 				//// Grid row dragging options
 
 				$scope.entityJqyouiDraggable =
+				$scope.unitJqyouiDraggable =
 				$scope.connectionJqyouiDraggable =
 				$scope.externalJqyouiDraggable = {
 					placeholder: true,
@@ -70,6 +90,7 @@ define(['jquery',
 
 
 				$scope.entityJqyouiOptions =
+				$scope.unitJqyouiOptions =
 				$scope.connectionJqyouiOptions = {
 					helper:   function (event) {
 						var gridID = $(event.currentTarget)
@@ -135,6 +156,21 @@ define(['jquery',
 					enableCellEdit: true
 				}, _.cloneDeep(DEFAULT_INITIAL_GRID_OPTIONS));
 
+				$scope.unitGrid = _.defaults({
+					data:        'units',
+					rowTemplate: 'partial/main/unitRow.html',
+					columnDefs:  [
+//						{ width: 30, cellHeaderTemplate: "", cellTemplate: 'partial/main/drag-handle-cell.html' },
+						{ field: '_id', displayName: 'URI', width: 160 },
+						{ field: 'name', displayName: 'Name', enableCellEdit: true },
+						{ field: 'description', displayName: 'Description', enableCellEdit: false, visible: false }
+					],
+					showFilter:     true,
+					showColumnMenu: true,
+					enableSorting:  true,
+					enableCellEdit: true
+				}, _.cloneDeep(DEFAULT_INITIAL_GRID_OPTIONS));
+
 				$scope.connectionGrid = _.defaults({
 					data:        'connections',
 					rowTemplate: 'partial/main/connectionRow.html',
@@ -158,7 +194,7 @@ define(['jquery',
 				}, _.cloneDeep(DEFAULT_INITIAL_GRID_OPTIONS));
 
 
-				//// Fetch initial entities and connections
+				//// Fetch initial entities, units and connections
 
 				Resources.entities.progressively().then(function (data) {
 					$scope.entities = data.entities;
@@ -168,6 +204,16 @@ define(['jquery',
 				}, function (data) {
 					$scope.entities = data.entities;
 					$scope.totalEntityCount = data.totalCount;
+				});
+
+				Resources.units.progressively().then(function (data) {
+					$scope.units = data.units;
+					$scope.totalUnitCount = data.totalCount;
+				}, function (err) {
+					console.error(err);
+				}, function (data) {
+					$scope.units = data.units;
+					$scope.totalUnitCount = data.totalCount;
 				});
 
 
@@ -185,7 +231,7 @@ define(['jquery',
 
 			link: function ($scope, iElement) {
 
-				//// trigger proper resize events when panes resize
+				//// trigger proper resize events when panes resize or toggle
 
 				$scope.onResizeAll = function onResizeAll() {
 					$scope.onResizeTop();
@@ -194,6 +240,7 @@ define(['jquery',
 
 				$scope.onResizeTop = function onResizeTop() {
 					iElement.find('.ric-entities-grid').trigger('resize');
+					iElement.find('.ric-units-grid').trigger('resize');
 					iElement.find('.ric-connections-grid').trigger('resize');
 				};
 
@@ -201,24 +248,63 @@ define(['jquery',
 					iElement.find('.ric-externals-grid').trigger('resize');
 				};
 
+				$scope.$watch('activePanels.main', function (mainPanel) {
+					if (mainPanel === $scope.panels.anatomical) {
+						iElement.find('.ric-entities-grid').trigger('resize');
+					} else if (mainPanel === $scope.panels.units) {
+						iElement.find('.ric-units-grid').trigger('resize');
+					}
+				});
+
 
 				//// block controls while loading
 
 				$scope.$watch('0 < entities.length && entities.length === totalEntityCount', function () {
 					iElement.find('.ric-entities-grid').trigger('resize');
+					iElement.find('.ric-units-grid').trigger('resize');
 				});
 
 
-				//// Switching between entity view and connection view
+				//// Switching between entity/unit view and connection view
 
 				$scope.selectedType = '';
 				$scope.selected = null;
 
 				$scope.$watchCollection('entityGrid.selectedItems', function (items) {
+					console.debug('entityGridSelected:', items);
 					if (items.length > 0) {
+						console.debug('entityGridSelected(2):', items);
 						$scope.selectedType = 'entity';
 						$scope.selected = items[0];
-						$scope.connectionGrid.selectedItems = [];
+						$scope.connectionGrid.selectedItems.pop();
+						$scope.unitGrid.selectedItems.pop();
+
+						//// Dropping meta-data
+
+						// This timeout is another ugly hack. The proper redesign
+						// of this code will NOT use ngGrid and will use directives.
+						$timeout(function () {
+							$('.ric-metadata-drop-area').droppable({
+								accept:      '.ric-externals-grid .draggable',
+								activeClass: 'activeDroppable',
+								hoverClass:  'hoveredDroppable',
+								drop:        $bind(function (event, ui) {
+									var newExternal = ui.helper.data('draggedItem');
+									$scope.addMetadata($scope.selected, newExternal);
+								})
+							});
+						}, 100);
+					}
+				});
+
+				$scope.$watchCollection('unitGrid.selectedItems', function (items) {
+					console.debug('unitGridSelected:', items);
+					if (items.length > 0) {
+						console.debug('unitGridSelected(2):', items);
+						$scope.selectedType = 'unit';
+						$scope.selected = items[0];
+						$scope.connectionGrid.selectedItems.pop();
+						$scope.entityGrid.selectedItems.pop();
 
 						//// Dropping meta-data
 
@@ -242,35 +328,63 @@ define(['jquery',
 					if (items.length > 0) {
 						$scope.selectedType = 'connection';
 						$scope.selected = items[0];
-						$scope.entityGrid.selectedItems = [];
+						$scope.entityGrid.selectedItems.pop();
+						$scope.unitGrid.selectedItems.pop();
 					}
 				});
 
 
 				//// adding metadata
 
-				$scope.addMetadata = function (entity, metadata) {
+				$scope.addMetadata = function (item, metadata) {
 					if (_(metadata.type).isUndefined() || _(metadata.type).isEmpty()) { return; }
 
-					var isRedundant = _(entity.externals).some(function (external) {
-						return external.type === metadata.type &&
-						       external.external._id === metadata.external._id;
-					});
+					var isRedundant;
+					if ($scope.selectedType === 'entity') {
 
-					if (isRedundant) { return; }
+						isRedundant = _(item.externals).some(function (external) {
+							return external.type === metadata.type &&
+							       external.external._id === metadata.external._id;
+						});
 
-					//// Send the new metadata to the server first.
-					//// When the response comes back, add it to the GUI.
+						if (isRedundant) { return; }
 
-					Resources.addMetadata(entity._id, metadata).then(function (metadata) {
-						//// add the metadata
-						entity.externals.push(metadata);
+						//// Send the new metadata to the server first.
+						//// When the response comes back, add it to the GUI.
 
-						//// record the relationship type
-						$scope.relTypes.push(metadata.type);
-						$scope.relTypes = _.uniq($scope.relTypes);
-						$scope.currentCustomRelType = "";
-					});
+						Resources.addMetadata(item._id, metadata).then(function (metadata) {
+							//// add the metadata
+							item.externals.push(metadata);
+
+							//// record the relationship type
+							$scope.relTypes.push(metadata.type);
+							$scope.relTypes = _.uniq($scope.relTypes);
+							$scope.currentCustomRelType = "";
+						});
+
+					} else if ($scope.selectedType === 'unit') {
+
+						isRedundant = _(item.externals).some(function (external) {
+							return external.type === metadata.type &&
+									external.external._id === metadata.external._id;
+						});
+
+						if (isRedundant) { return; }
+
+						//// Send the new metadata to the server first.
+						//// When the response comes back, add it to the GUI.
+
+						Resources.addUnitMetadata(item._id, metadata).then(function (metadata) {
+							//// add the metadata
+							item.externals.push(metadata);
+
+							//// record the relationship type
+							$scope.relTypes.push(metadata.type);
+							$scope.relTypes = _.uniq($scope.relTypes);
+							$scope.currentCustomRelType = "";
+						});
+
+					}
 				};
 
 
@@ -281,9 +395,15 @@ define(['jquery',
 					//// Send the request to the server first.
 					//// When the response comes back, remove the meta-data from the GUI.
 
-					Resources.removeMetadata(entity._id, metadata.type, metadata.external._id).then(function () {
-						_(entity.externals).remove(metadata);
-					});
+					if ($scope.selectedType === 'entity') {
+						Resources.removeMetadata(entity._id, metadata.type, metadata.external._id).then(function () {
+							_(entity.externals).remove(metadata);
+						});
+					} else if ($scope.selectedType === 'unit') {
+						Resources.removeUnitMetadata(entity._id, metadata.type, metadata.external._id).then(function () {
+							_(entity.externals).remove(metadata);
+						});
+					}
 
 				};
 
