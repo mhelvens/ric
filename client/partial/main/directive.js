@@ -271,9 +271,7 @@ define(['jquery',
 				$scope.selected = null;
 
 				$scope.$watchCollection('entityGrid.selectedItems', function (items) {
-					console.debug('entityGridSelected:', items);
 					if (items.length > 0) {
-						console.debug('entityGridSelected(2):', items);
 						$scope.selectedType = 'entity';
 						$scope.selected = items[0];
 						$scope.connectionGrid.selectedItems.pop();
@@ -298,9 +296,7 @@ define(['jquery',
 				});
 
 				$scope.$watchCollection('unitGrid.selectedItems', function (items) {
-					console.debug('unitGridSelected:', items);
 					if (items.length > 0) {
-						console.debug('unitGridSelected(2):', items);
 						$scope.selectedType = 'unit';
 						$scope.selected = items[0];
 						$scope.connectionGrid.selectedItems.pop();
