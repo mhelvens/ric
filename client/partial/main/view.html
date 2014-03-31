@@ -177,16 +177,12 @@
                     <div class="panel-body external-resources-body">
                         <div ng-hide="externalBusy" class="ric-externals-grid" ng-grid="externalGrid"></div>
                         <div class="file-interface">
-                            <input ng-disabled="!(0 < entities.length && entities.length === totalEntityCount) || !(0 < units.length && units.length === totalUnitCount)"
-                                   class="file-import" type="file" style="display: none">
-                            <button ng-disabled="!(0 < entities.length && entities.length === totalEntityCount) || !(0 < units.length && units.length === totalUnitCount)"
-                                    class="btn btn-success" ng-click="importExternals()">Import
+                            <input class="file-import" type="file" style="display: none">
+                            <button class="btn btn-success" ng-click="importExternals()">Import
                             </button>
-                            <button ng-disabled="!(0 < entities.length && entities.length === totalEntityCount) || !(0 < units.length && units.length === totalUnitCount)"
-                                    class="btn btn-danger" ng-click="clearExternals()">Clear
+                            <button class="btn btn-danger" ng-click="clearExternals()">Clear
                             </button>
-                            <a ng-disabled="!(0 < entities.length && entities.length === totalEntityCount) || !(0 < units.length && units.length === totalUnitCount)"
-                               download="metadata.txt" href="/metadata.txt" class="btn btn-default"
+                            <a download="metadata.txt" href="/metadata.txt" class="btn btn-default"
                                style="float: right;">Export Metadata</a>
                         </div>
                     </div>

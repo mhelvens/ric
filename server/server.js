@@ -43,6 +43,7 @@ app.use(app.router);
 
 app.get('/metadata.txt', function (req, res) {
 	db.Metadata.find()
+			.populate('entity', '_id name')
 			.exec(function (err, metas) {
 				if (err) {
 					res.status(HTTP_INTERNAL_SERVER_ERROR).send(null);
@@ -51,13 +52,15 @@ app.get('/metadata.txt', function (req, res) {
 
 				var result = "";
 
-				_.each(metas, function (meta) {
+				_.forEach(metas, function (meta) {
 					result += meta.eid +
 					          "\t" +
 					          meta.type +
 					          "\t" +
-					          meta.entity +
-					          "\r\n";
+					          meta.entity._id +
+					          "\t(" +
+					          meta.entity.name +
+					          ")\r\n";
 				});
 
 				res.status(HTTP_OK).send(result);

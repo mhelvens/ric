@@ -92,7 +92,7 @@ connectionSchema.index({ from: 1, to: 1 }, { unique: true });
 connectionSchema.index({ type: 1 });
 
 var metadataSchema = new mongoose.Schema({
-	entity: StringType(),
+	entity: EntityReference(),
 	type:   StringType(),
 	eid:    StringType(),
 	name:   StringType()
