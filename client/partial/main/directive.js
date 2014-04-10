@@ -148,7 +148,16 @@ define(['jquery',
 //						{ width: 30, cellHeaderTemplate: "", cellTemplate: 'partial/main/drag-handle-cell.html' },
 						{ field: '_id', displayName: 'URI', width: 160 },
 						{ field: 'name', displayName: 'Name', enableCellEdit: true },
-						{ field: 'description', displayName: 'Description', enableCellEdit: false, visible: false }
+						{ field: 'description', displayName: 'Description', enableCellEdit: false, visible: false },
+						{
+							field: 'reachable',
+							displayName: 'Reachable',
+							width: 30,
+							enableCellEdit: false,
+							visible: true,
+							cellTemplate: 'partial/main/reachable-glyph-cell.html',
+							headerClass: 'hidden'
+						}
 					],
 					showFilter:     true,
 					showColumnMenu: true,
@@ -217,15 +226,10 @@ define(['jquery',
 				});
 
 
-				(function loadConnections(skip) {
-					Resources.connections.all({ skip: 0, limit: SERVER_REQUEST_SIZE }).then(function (connections) {
-						console.log('Fetching connections from server:', skip, 'to', skip + SERVER_REQUEST_SIZE);
-						$scope.connections = $scope.connections.concat(connections);
-						if (connections.length === SERVER_REQUEST_SIZE) {
-							loadConnections(skip + SERVER_REQUEST_SIZE);
-						}
-					});
-				})(0);
+				console.log('Fetching all connections from server...');
+				Resources.connections.all().then(function (connections) {
+					$scope.connections = connections;
+				});
 
 			}],
 

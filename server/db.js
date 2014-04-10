@@ -21,6 +21,13 @@ mongoose.connect(vars.dbServer, vars.dbName);
 ///////////////////////// Convenience Definitions //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+function BooleanType(other) {
+	return _.assign({
+		type:    Boolean,
+		default: false
+	}, other);
+}
+
 function StringType(other) {
 	return _.assign({
 		type:    String,
@@ -72,7 +79,9 @@ var entitySchema = new mongoose.Schema({
 	name:        StringType(),
 	description: StringType(),
 	sub:         [subEntitySchema],
-	externals:   [subExternalSchema]
+	super:       [EntityReference()],
+	externals:   [subExternalSchema],
+	reachable:   BooleanType()
 }, { _id: false });
 entitySchema.index({ externals: 1 });
 

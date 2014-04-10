@@ -242,3 +242,14 @@ body {
 
 }
 
+.reachable-cell {
+	width: 30px;
+	height: 30px;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 26px;
+}
+
+.hidden {
+	display: none !important;
+}

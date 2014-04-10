@@ -81,7 +81,7 @@ app.get('/metadata.txt', function (req, res) {
 //// GET count of entities
 
 app.get('/resources/entities/count', function (req, res) {
-	db.Entity.count({}, function (err, count) {
+	db.Entity.count({ meta: { $exists: false } }, function (err, count) {
 		if (err) {
 			console.log(err);
 			res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
@@ -121,6 +121,7 @@ app.get('/resources/entities', function (req, res) {
 	var skip = req.query.skip || 0;
 	var limit = req.query.limit || Infinity;
 	db.Entity.find()
+			.where({ meta: { $exists: false } })
 			.sort({ '_id': 1 })
 			.skip(skip)
 			.limit(limit)
