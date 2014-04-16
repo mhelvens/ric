@@ -108,11 +108,13 @@
                                         <div style="padding: 1px 0 3px 5px; line-height: 26px;">
 											<span ng-repeat-start="metadata in selected.externals"
                                                   class="label label-default">
+												<span>{{ metadata.external.type }}</span>
+												&nbsp;
 												<span style="font-weight: normal;">{{ metadata.external.name }}</span>
 												&nbsp;
 												<span>{{ metadata.type }}</span>
 												&nbsp;
-												<span style="font-weight: normal;">this</span>
+												<span style="font-weight: normal;">this {{selectedType}}</span>
 												&nbsp;
 												<span ng-click="removeMetadata(selected, metadata)"
                                                       class="glyphicon glyphicon-remove"
@@ -176,6 +178,36 @@
                     </h3></div>
                     <div class="panel-body external-resources-body">
                         <div ng-hide="externalBusy" class="ric-externals-grid" ng-grid="externalGrid"></div>
+
+
+                        <div style="border-top: dotted 1px lightgray; margin: 0; padding: 1px 4px 3px 4px;" class="ext-types">
+                            <label ng-repeat="extType in extTypes"
+                                   class="radio-inline"
+                                   style="display: inline-block; margin-left: 0; margin-right: 10px;">
+                                <input type="radio"
+                                       name="meta-external-type"
+                                       ng-model="mainScope.currentExtType"
+                                       value="{{ extType }}">
+                                {{ extType }}
+                            </label>
+                            <label class="radio-inline"
+                                   style="display: inline-block; margin-left: 0;">
+                                <input type="radio"
+                                       name="meta-external-type"
+                                       ng-model="mainScope.currentExtType"
+                                       ng-value="mainScope.currentCustomExtType">
+                                <input type="text"
+                                       class="form-control"
+                                       ng-model="mainScope.currentCustomExtType"
+                                       placeholder="new type..."
+                                       ng-change="mainScope.currentExtType = mainScope.currentCustomExtType"
+                                       style="padding: 2px 1px 2px 1px; height: 18px; font-size: 12px;">
+                            </label>
+                        </div>
+
+
+
+
                         <div class="file-interface">
                             <input class="file-import" type="file" style="display: none">
                             <button class="btn btn-success" ng-click="importExternals()">Import

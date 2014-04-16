@@ -45,6 +45,16 @@ define(['jquery',
 					$scope.currentRelType = relTypes[0];
 				});
 
+				//// external types
+
+				$scope.extTypes = [];
+				$scope.currentExtType = '';
+
+				Resources.metadataExtTypes().then(function (extTypes) {
+					$scope.extTypes = extTypes;
+					$scope.currentExtType = extTypes[0];
+				});
+
 
 				//// DB Elements
 
@@ -129,7 +139,8 @@ define(['jquery',
 									type:     $scope.currentRelType,
 									external: {
 										_id:  $(event.currentTarget).find('.col1 > span').text().trim(),
-										name: $(event.currentTarget).find('.col2 > span').text().trim()
+										name: $(event.currentTarget).find('.col2 > span').text().trim(),
+										type: $scope.currentExtType
 									}
 								});
 
@@ -360,6 +371,11 @@ define(['jquery',
 							$scope.relTypes.push(metadata.type);
 							$scope.relTypes = _.uniq($scope.relTypes);
 							$scope.currentCustomRelType = "";
+
+							//// record the external type
+							$scope.extTypes.push(metadata.external.type);
+							$scope.extTypes = _.uniq($scope.extTypes);
+							$scope.currentCustomExtType = "";
 						});
 
 					} else if ($scope.selectedType === 'unit') {
@@ -382,6 +398,11 @@ define(['jquery',
 							$scope.relTypes.push(metadata.type);
 							$scope.relTypes = _.uniq($scope.relTypes);
 							$scope.currentCustomRelType = "";
+
+							//// record the external type
+							$scope.extTypes.push(metadata.external.type);
+							$scope.extTypes = _.uniq($scope.extTypes);
+							$scope.currentCustomExtType = "";
 						});
 
 					}
@@ -422,6 +443,8 @@ define(['jquery',
 						//// parse file as follows:
 						//// uri <whitespace with tab inside> name <whitespace with newline inside>
 						//// ...
+
+
 
 						_(fileReader.result.split(/\s*[\f\n\r]\s*/)).each(function (line) {
 							var match = line.match(/([^\t]+)\s*\t\s*([^\t]+)/);

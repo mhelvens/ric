@@ -1,244 +1,251 @@
 @import "base";
 
 .panel {
-  width: 100%;
-  height: 100%;
-  padding-top: $ric-panel-height;
-  position: relative;
-
-  & > .panel-heading {
-	@include box-sizing(border-box);
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: $ric-panel-height;
-	white-space: nowrap;
-	& > h3 {
-	  font-weight: bold;
-	  margin: 0px;
-	}
-
-	& > .btn-group {
-		margin: 0;
-	  position: absolute;
-	  top: 7px;
-	  right: 7px;
-	}
-  }
-
-  & > .panel-body {
-	position: relative;
-	padding: 0px;
+	width: 100%;
 	height: 100%;
-	overflow: auto;
-  }
+	padding-top: $ric-panel-height;
+	position: relative;
 
-  overflow: hidden;
+	& > .panel-heading {
+		@include box-sizing(border-box);
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: $ric-panel-height;
+		white-space: nowrap;
+		& > h3 {
+			font-weight: bold;
+			margin: 0px;
+		}
+
+		& > .btn-group {
+			margin: 0;
+			position: absolute;
+			top: 7px;
+			right: 7px;
+		}
+	}
+
+	& > .panel-body {
+		position: relative;
+		padding: 0px;
+		height: 100%;
+		overflow: auto;
+	}
+
+	overflow: hidden;
 }
 
 .ric-connections-grid {
-  @include box-sizing(content-box);
-  width: 100%;
-  height: 100% !important;
-  min-height: 100% !important;
-  overflow: hidden;
+	@include box-sizing(content-box);
+	width: 100%;
+	height: 100% !important;
+	min-height: 100% !important;
+	overflow: hidden;
 }
 
 .split-panes {
-  &.vertical {
-	& > .split-pane1 > .split-panes {
-	  bottom: .75 * $ric-spacing !important;
+	&.vertical {
+		& > .split-pane1 > .split-panes {
+			bottom: .75 * $ric-spacing !important;
+		}
+		& > .split-pane2 > .split-panes {
+			top: .75 * $ric-spacing !important;
+		}
 	}
-	& > .split-pane2 > .split-panes {
-	  top: .75 * $ric-spacing !important;
+	&.horizontal {
+		& > .split-pane1 > .split-panes {
+			right: .75 * $ric-spacing !important;
+		}
+		& > .split-pane2 > .split-panes {
+			left: .75 * $ric-spacing !important;
+		}
 	}
-  }
-  &.horizontal {
-	& > .split-pane1 > .split-panes {
-	  right: .75 * $ric-spacing !important;
-	}
-	& > .split-pane2 > .split-panes {
-	  left: .75 * $ric-spacing !important;
-	}
-  }
 }
 
 .split-panes.horizontal > .split-handler {
-  border-left: dotted 1px gray;
-  border-right: dotted 1px gray;
-  width: 6px !important;
-  margin-left: -3px !important;
-  top: 25% !important;
-  bottom: 25% !important;
+	border-left: dotted 1px gray;
+	border-right: dotted 1px gray;
+	width: 6px !important;
+	margin-left: -3px !important;
+	top: 25% !important;
+	bottom: 25% !important;
 }
 
 .split-panes.horizontal > .split-pane1 {
-  padding-right: .75 * $ric-spacing !important;
+	padding-right: .75 * $ric-spacing !important;
 }
 
 .split-panes.horizontal > .split-pane2 {
-  border-left: none !important;
-  padding-left: .75 * $ric-spacing !important;
+	border-left: none !important;
+	padding-left: .75 * $ric-spacing !important;
 }
 
 .split-panes.vertical > .split-handler {
-  border-bottom: dotted 1px gray;
-  border-top: dotted 1px gray;
-  height: 6px !important;
-  margin-top: -3px !important;
-  left: 25% !important;
-  right: 25% !important;
+	border-bottom: dotted 1px gray;
+	border-top: dotted 1px gray;
+	height: 6px !important;
+	margin-top: -3px !important;
+	left: 25% !important;
+	right: 25% !important;
 }
 
 .split-panes.vertical > .split-pane1 {
-  padding-bottom: .75 * $ric-spacing !important;
+	padding-bottom: .75 * $ric-spacing !important;
 }
 
 .split-panes.vertical > .split-pane2 {
-  border-top: none !important;
-  padding-top: .75 * $ric-spacing !important;
+	border-top: none !important;
+	padding-top: .75 * $ric-spacing !important;
 }
 
 //// stuff about dragging
 
 .drag-handle {
-  @include drag-handle(4, 4);
-  margin: 5px;
+	@include drag-handle(4, 4);
+	margin: 5px;
 }
 
 body {
-  overflow: hidden; // to avoid scroll-bars when a row gets dragged out of bounds
+	overflow: hidden; // to avoid scroll-bars when a row gets dragged out of bounds
 }
 
 .drag-helper .ngRow {
-  @include border-radius(5px);
-  border: solid 1px gray;
+	@include border-radius(5px);
+	border: solid 1px gray;
 }
 
 //// about the details panel
 
 .details-panel {
-  position: relative;
-  padding: 10px !important;
-  & > table {
-	@include box-sizing(margin-box);
-	position: absolute;
-	width: 100%;
-	table-layout: fixed;
-	border-spacing: 5px 0px !important;
-	& > tbody {
-	  & > tr {
-		& > th {
-		  width: 100px;
+	position: relative;
+	padding: 10px !important;
+	& > table {
+		@include box-sizing(margin-box);
+		position: absolute;
+		width: 100%;
+		table-layout: fixed;
+		border-spacing: 5px 0px !important;
+		& > tbody {
+			& > tr {
+				& > th {
+					width: 100px;
+				}
+				& > td {
+					padding: 5px;
+				}
+			}
 		}
-		& > td {
-		  padding: 5px;
-		}
-	  }
 	}
-  }
 }
 
 .activeDroppable {
-  background-color: #dff !important;
+	background-color: #dff !important;
 }
 
 .hoveredDroppable {
-  background-color: #4ff !important;
+	background-color: #4ff !important;
 }
 
 .external-resources-body {
-  margin-bottom: 30px;
-  position: relative;
+	margin-bottom: 30px;
+	position: relative;
 
-  & > .ric-externals-grid {
-	@include box-sizing(content-box);
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 44px;
-	overflow: hidden;
-  }
+	& > .ric-externals-grid {
+		@include box-sizing(content-box);
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 70px;
+		overflow: hidden;
+	}
 
-  & > .file-interface {
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	height: 44px;
-	padding: 5px;
-	border-top: dotted 1px gray;
-  }
+	& > .ext-types {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 44px;
+		height: 26px;
+	}
+
+	& > .file-interface {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		height: 44px;
+		padding: 5px;
+		border-top: dotted 1px gray;
+	}
 }
 
 //// progress bars
 
 .entities-panel-body {
-  position: relative;
+	position: relative;
 
-  & > .ric-entities-grid {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 20px;
-	overflow: hidden;
-  }
-
-  & > .entities-progressbar {
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	height: 20px;
-	margin: 0;
-  }
-
-  &.all-entities-loaded {
 	& > .ric-entities-grid {
-	  bottom: 0;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 20px;
+		overflow: hidden;
 	}
 
 	& > .entities-progressbar {
-	  display: none;
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		height: 20px;
+		margin: 0;
 	}
-  }
+
+	&.all-entities-loaded {
+		& > .ric-entities-grid {
+			bottom: 0;
+		}
+
+		& > .entities-progressbar {
+			display: none;
+		}
+	}
 
 }
 
-
 .units-panel-body {
-  position: relative;
+	position: relative;
 
-  & > .ric-units-grid {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 20px;
-	overflow: hidden;
-  }
-
-  & > .units-progressbar {
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	height: 20px;
-	margin: 0;
-  }
-
-  &.all-units-loaded {
 	& > .ric-units-grid {
-	  bottom: 0;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 20px;
+		overflow: hidden;
 	}
 
 	& > .units-progressbar {
-	  display: none;
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		height: 20px;
+		margin: 0;
 	}
-  }
+
+	&.all-units-loaded {
+		& > .ric-units-grid {
+			bottom: 0;
+		}
+
+		& > .units-progressbar {
+			display: none;
+		}
+	}
 
 }
 

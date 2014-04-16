@@ -136,8 +136,11 @@ define(['app/module', 'lodash'], function (Ric, _) {
 		};
 
 		result.metadataRelTypes = function () {
-			// not sure why, but the $resources way returns the strings as objects...
 			return $http.get('/resources/reltypes').then(getField('data'));
+		};
+
+		result.metadataExtTypes = function () {
+			return $http.get('/resources/exttypes').then(getField('data'));
 		};
 
 		result.addMetadata = function (id, metadata) {

@@ -197,9 +197,10 @@ app.post('/resources/entities/:id/externals', function (req, res) {
 
 		var newMeta = new db.Metadata({
 			entity: req.params.id,
-			type:   req.body.type,
-			eid:    req.body.external._id,
-			name:   req.body.external.name
+			type  : req.body.type,
+			eid   : req.body.external._id,
+			name  : req.body.external.name,
+			externalType: req.body.external.type
 		});
 
 		newMeta.save(function (err, meta) {
@@ -270,8 +271,6 @@ app.delete('/resources/entities/:id/externals/:type/:eid', function (req, res) {
 		});
 	});
 });
-
-
 
 
 /////////////////  //  //  /  /  /
@@ -394,10 +393,11 @@ app.post('/resources/units/:id/externals', function (req, res) {
 		//// add it to the metadata collection too, to get quick access when needed
 
 		var newMeta = new db.Metadata({
-			entity: req.params.id, // this key is still called 'entity'
-			type:   req.body.type,
-			eid:    req.body.external._id,
-			name:   req.body.external.name
+			entity      : req.params.id, // this key is still called 'entity'
+			type        : req.body.type,
+			eid         : req.body.external._id,
+			name        : req.body.external.name,
+			externalType: req.body.external.type
 		});
 
 		newMeta.save(function (err, meta) {
@@ -469,10 +469,6 @@ app.delete('/resources/units/:id/externals/:type/:eid', function (req, res) {
 		});
 	});
 });
-
-
-
-
 
 
 ///////////////////////  //  //  /  /  /
@@ -671,6 +667,21 @@ app.get('/resources/reltypes', function (req, res) {
 			return;
 		}
 		res.status(HTTP_OK).json(relTypes);
+	});
+});
+
+
+//////////////////////////  //  //  /  /  /
+///// External types ////  //  //  /  /  /
+////////////////////////  //  //  /  /  /
+
+app.get('/resources/exttypes', function (req, res) {
+	db.Metadata.distinct('externalType').exec(function (err, extTypes) {
+		if (err) {
+			res.status(HTTP_NOT_FOUND).json(err);
+			return;
+		}
+		res.status(HTTP_OK).json(extTypes);
 	});
 });
 
