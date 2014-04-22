@@ -43,7 +43,7 @@ app.use(app.router);
 
 app.get('/metadata.txt', function (req, res) {
 	db.Metadata.find()
-			.populate('entity', '_id name')
+			.populate('entity', '_id name externals')
 			.exec(function (err, metas) {
 				if (err) {
 					res.status(HTTP_INTERNAL_SERVER_ERROR).send(null);
@@ -53,7 +53,17 @@ app.get('/metadata.txt', function (req, res) {
 				var result = "";
 
 				_.forEach(metas, function (meta) {
-					result += meta.eid +
+					var externalType = "";
+
+					_.forEach(meta.entity.externals, function (ext) {
+						if (ext.external._id === meta.eid) {
+							externalType = ext.external.type;
+						}
+					});
+
+					result += externalType +
+					          "\t" +
+					          meta.eid +
 					          "\t" +
 					          meta.type +
 					          "\t" +
@@ -203,7 +213,7 @@ app.post('/resources/entities/:id/externals', function (req, res) {
 			externalType: req.body.external.type
 		});
 
-		newMeta.save(function (err, meta) {
+		newMeta.save(function (err/*, meta*/) {
 			if (err) {
 				console.log(err);
 				res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
@@ -400,7 +410,7 @@ app.post('/resources/units/:id/externals', function (req, res) {
 			externalType: req.body.external.type
 		});
 
-		newMeta.save(function (err, meta) {
+		newMeta.save(function (err/*, meta*/) {
 			if (err) {
 				console.log(err);
 				res.status(HTTP_INTERNAL_SERVER_ERROR).json(err);
