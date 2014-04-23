@@ -6,11 +6,9 @@ define(['jquery',
         'resource/service',
         'bg-splitter',
         '$bind/service',
-        'css!lib/bg-splitter/css/style'], function ($, Ric) {
+        'css!lib/bg-splitter/css/style'], function ($, app) {
 //  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-	var SERVER_REQUEST_SIZE = 500; // entities per request
 
 	var GRID_ROW_HEIGHT = 30; // px
 
@@ -24,7 +22,7 @@ define(['jquery',
 		selectedItems:   []
 	};
 
-	Ric.directive('ricInterface', ['Resources', '$timeout', '$bind', function (Resources, $timeout, $bind) {
+	app.directive('ricInterface', ['Resources', '$timeout', '$bind', function (Resources, $timeout, $bind) {
 		return {
 			restrict:    'E',
 			templateUrl: 'partial/main/view.html',

@@ -1,7 +1,7 @@
 'use strict';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-define(['app/module', 'lodash'], function (Ric, _) {
+define(['app/module', 'lodash'], function (app, _) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -23,7 +23,7 @@ define(['app/module', 'lodash'], function (Ric, _) {
 		}
 	}
 
-	Ric.factory('Resources', ['$resource', '$http', '$q', function ($resource, $http, $q) {
+	app.factory('Resources', ['$resource', '$http', '$q', function ($resource, $http, $q) {
 
 		//// create $resource classes
 

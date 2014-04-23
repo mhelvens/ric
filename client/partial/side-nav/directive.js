@@ -1,11 +1,11 @@
 'use strict';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-define(['app/module', 'lodash', 'focus/service', 'partial/side-nav/details/directive'], function (Ric, _) {
+define(['app/module', 'focus/service', 'partial/side-nav/details/directive'], function (app) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	Ric.directive('ricSideNav', ['FocusService', function (FocusService) {
+	app.directive('ricSideNav', ['FocusService', function (FocusService) {
 		return {
 			restrict   : 'E',
 			replace    : true,
