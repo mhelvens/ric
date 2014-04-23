@@ -69,16 +69,23 @@ var subExternalSchema = new mongoose.Schema({
 	type    : StringType()
 });
 
+var subProteinInteractionSchema = new mongoose.Schema({
+	interaction: [StringType()]
+});
+
+
 //// main schemas
 
 var entitySchema = new mongoose.Schema({
-	_id        : StringType({ unique: true }),
-	name       : StringType(),
-	description: StringType(),
-	sub        : [subEntitySchema],
-	super      : [EntityReference()],
-	externals  : [subExternalSchema],
-	reachable  : BooleanType()
+	_id                : StringType({ unique: true }),
+	name               : StringType(),
+	description        : StringType(),
+	sub                : [subEntitySchema],
+	super              : [EntityReference()],
+	externals          : [subExternalSchema],
+	proteins           : [StringType()],
+	proteinInteractions: [subProteinInteractionSchema],
+	reachable          : BooleanType()
 }, { _id: false });
 entitySchema.index({ externals: 1 });
 
