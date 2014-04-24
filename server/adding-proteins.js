@@ -34,11 +34,11 @@ var FMA = [
 ];
 
 var fmaToProteins = {};
-var proteinsToFMA = {};
+//var proteinsToFMA = {}; // Not needed right now
 var fmaToProteinInteractions = {};
 
 csv()
-		.from.path('server/adding-proteins/proteins.csv', { columns: true, trim: true })
+		.from.path('server/adding-proteins/proteins-reduced.csv', { columns: true, trim: true })
 		.to.array(function (data, count) {
 
 			//////////////////////////////////////// gather the data ////////////////////////////////////////
@@ -85,7 +85,6 @@ csv()
 			//////////////////////////////////////// display statistics ////////////////////////////////////////
 
 			console.log('read:         ', count + ' rows');
-			console.log('proteins:     ', _(proteinsToFMA).size());
 
 			var expressionCount = 0;
 			var perFMACount = {};
@@ -103,8 +102,6 @@ csv()
 
 			//////////////////////////////////////// populate the database ////////////////////////////////////////
 
-			// TODO: there is too much data right now; add it to the database after I get a filter from Bernard
-
 //			_(FMA).forEach(function (fmaNr) {
 //				var fmaID = 'fma:' + fmaNr;
 //
@@ -113,7 +110,9 @@ csv()
 //						proteins           : fmaToProteins[fmaID],
 //						proteinInteractions: fmaToProteinInteractions[fmaID]
 //					}
-//				}, { multi: true });
+//				}, { multi: true }, function () {
+//					console.log('stored: ' + fmaID);
+//				});
 //
 //			});
 
