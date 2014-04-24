@@ -1,12 +1,11 @@
 'use strict';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-define(['app/module', 'chroma', 'lodash', 'resource/service'], function
-		(Ric, color, _) {
+define(['app/module', 'resource/service'], function (app) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	Ric.directive('ricEntityDetails', ['Resources', function (Resources) {
+	app.directive('ricEntityDetails', ['Resources', function (/*Resources*/) {
 		return {
 			restrict:    'E',
 			replace:     true,

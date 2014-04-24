@@ -13,15 +13,15 @@ define(['angular',
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	var Ric = ng.module('Ric', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngDragDrop', 'ngGrid', 'bgDirectives']);
+	var app = ng.module('Ric', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngDragDrop', 'ngGrid', 'bgDirectives']);
 
 
-	Ric.config(function ($locationProvider) {
+	app.config(function ($locationProvider) {
 		$locationProvider.html5Mode(false).hashPrefix('!');
 	});
 
 
-	return Ric;
+	return app;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
