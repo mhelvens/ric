@@ -5,8 +5,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 var _ = require('lodash');
-var vars = require('./../../apinatomy/server/vars');
-var db = require('./../../apinatomy/server/db');
+var vars = require('./../../../apinatomy/server/vars');
+var db = require('./../../../apinatomy/server/db');
 var csv = require('csv');
 
 
