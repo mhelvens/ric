@@ -25,7 +25,7 @@ while (c.hasNext()) {
 }
 
 
-//// link sub and super
+//// link sub
 
 for (id in entities) {
 	e = entities[id];
