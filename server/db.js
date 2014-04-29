@@ -133,6 +133,13 @@ metadataSchema.index({ type: 1 });
 metadataSchema.index({ externalType: 1 });
 metadataSchema.index({ entity: 1, type: 1, eid: 1 }, { unique: true });
 
+var proteinSchema = new mongoose.Schema({
+	_id:            StringType({ unique: true }),
+	ensembl:        StringType(),
+	swissprot:      StringType(),
+	smallMolecules: [mongoose.Schema.Types.Mixed]
+});
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////// Models ///////////////////////////////////////////////
@@ -143,3 +150,4 @@ exports.Unit = mongoose.model('Unit', unitSchema);
 exports.Connection = mongoose.model('Connection', connectionSchema);
 exports.Path = mongoose.model('Path', pathSchema);
 exports.Metadata = mongoose.model('Metadata', metadataSchema);
+exports.Protein = mongoose.model('Protein', proteinSchema);
