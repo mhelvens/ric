@@ -44,15 +44,19 @@ function StringEnum() {
 	};
 }
 
-function EntityReference(other) {
-	return StringType(_.assign({ ref: 'Entity' }, other));
-}
-
 function NumberType(other) {
 	return _.assign({
 		type:    Number,
 		default: -1
 	}, other);
+}
+
+function EntityReference(other) {
+	return StringType(_.assign({ ref: 'Entity' }, other));
+}
+
+function ProteinReference(other) {
+	return StringType(_.assign({ ref: 'Protein' }, other));
 }
 
 
@@ -90,7 +94,7 @@ var entitySchema = new mongoose.Schema({
 	sub:                 [subEntitySchema],
 	super:               [EntityReference()],
 	externals:           [subExternalSchema],
-	proteins:            [StringType()],
+	proteins:            [ProteinReference()],
 	proteinInteractions: [subProteinInteractionSchema],
 	reachable:           BooleanType(),
 	descendantCount:     NumberType()
@@ -139,6 +143,8 @@ var proteinSchema = new mongoose.Schema({
 	swissprot:      StringType(),
 	smallMolecules: [mongoose.Schema.Types.Mixed]
 });
+metadataSchema.index({ ensembl: 1 });
+metadataSchema.index({ swissprot: 1 });
 
 
 ////////////////////////////////////////////////////////////////////////////////
