@@ -7,9 +7,15 @@ var db = mongo.getDB("ric");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+db.entities.remove({ _id: '24tile:60000000' });
+
 db.entities.insert({
 	_id: '24tile:60000000',
 	meta: true,
+	tileMap: {
+		spacing: 1,
+		layout: 'rowsOfTiles'
+	},
 	sub: [
 		{ entity: '24tile:60000001', type: 'seed' },
 		{ entity: '24tile:60000002', type: 'seed' },
