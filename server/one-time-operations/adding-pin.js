@@ -42,7 +42,7 @@ function listUrl(swissprot, page, pageSize) {
 }
 
 function openPHACTSGet(protein, url, fn) {
-	https.get(url, function (res, err) {
+	var req = https.get(url, function (res, err) {
 		if (res.statusCode === 200) {
 
 			var endData = "";
@@ -67,10 +67,33 @@ function openPHACTSGet(protein, url, fn) {
 
 		}
 	});
+
+	req.on('socket', function (socket) {
+		socket.setTimeout(60000); // 1 minute
+		socket.on('timeout', function () {
+			req.abort();
+			console.log('Timeout for: ' + protein._id + ' (trying again)');
+			openPHACTSGet(protein, url, fn);
+		});
+	});
+}
+
+var PAGE_SIZE = 100;
+
+var proteinMap = {};
+
+var requestCounter = 0;
+var responseCounter = 0;
+
+function overview() {
+	return '  (' + responseCounter + ' / ' + requestCounter + ')';
 }
 
 
-var proteinMap = {};
+
+// TODO: Only protein:ENSG00000205571, Q16637; too many small molecules; didn't fit into one document
+//       [Error: Document exceeds maximum allowed bson size of 16777216 bytes]
+
 
 
 csv()
@@ -128,8 +151,15 @@ csv()
 						//// storing small molecule details
 						//
 						function recursiveOpenPHACTSGet(prot, page, pageSize) {
-							console.log('Getting first page for: ' + protein._id);
+							++requestCounter;
+							if (page === 1) {
+								console.log('> Getting first page for: ' + protein._id + overview());
+							} else {
+								console.log('> Getting next page for: ' + protein._id + overview());
+							}
 							openPHACTSGet(prot, listUrl(prot.swissprot, page, pageSize), function (endData) {
+								++responseCounter;
+								console.log('< Got page for:          ' + prot._id + overview());
 
 								_(endData.result.items).forEach(function (item) {
 									prot.smallMolecules.push(item.hasMolecule);
@@ -137,16 +167,15 @@ csv()
 
 								//// next page
 								if (page * pageSize < prot.smallMoleculeCount) {
-									console.log('Getting next page for: ' + protein._id);
-									recursiveOpenPHACTSGet(protein, page + 1, 20);
+									recursiveOpenPHACTSGet(protein, page + 1, PAGE_SIZE);
 								} else {
 									prot.save(function (err/*, pprot*/) {
 										if (err) {
-											console.log(' - List (ERR): ' + prot.swissprot);
+											console.log(' - List (ERR): ' + prot.swissprot + overview());
 											console.log(err);
 											return;
 										}
-										console.log(' - List (OK): ' + prot._id);
+										console.log(' - List (OK): ' + prot._id + overview());
 									});
 								}
 
@@ -171,7 +200,7 @@ csv()
 									console.log(' - Count (OK): ' + protein._id);
 
 									if (protein.smallMoleculeCount !== 0) {
-										recursiveOpenPHACTSGet(protein, 1, 20);
+										recursiveOpenPHACTSGet(protein, 1, PAGE_SIZE);
 									}
 
 								});
@@ -181,7 +210,7 @@ csv()
 
 							console.log('Already Have Counter for: ' + protein._id + ' = ' + protein.smallMoleculeCount);
 
-							recursiveOpenPHACTSGet(protein, 1, 20);
+							recursiveOpenPHACTSGet(protein, 1, PAGE_SIZE);
 						}
 
 
