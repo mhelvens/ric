@@ -81,6 +81,7 @@ function openPHACTSGet(protein, url, fn) {
 var PAGE_SIZE = 100;
 
 var proteinMap = {};
+var storedSmallMolecules = {};
 
 var requestCounter = 0;
 var responseCounter = 0;
@@ -90,36 +91,32 @@ function overview() {
 }
 
 
-
-// TODO: Only protein:ENSG00000205571, Q16637; too many small molecules; didn't fit into one document
-//       [Error: Document exceeds maximum allowed bson size of 16777216 bytes]
-
-
-
 csv()
 		.from.path('ensembl-swissprot.csv', { columns: ['ensembl', 'swissprot'], trim: true })
-		.to.array(function (data, count) {
+		.to.array(function (data/*, count*/) {
 
 			_(data).forEach(function (csvProtein) {
 				if (csvProtein.swissprot) {
+
+
 					csvProtein._id = 'protein:' + csvProtein.ensembl;
-					db.Protein.find({ _id: csvProtein._id }, function (err, proteinData) {
+					db.Protein.find({ _id: csvProtein._id }, function (err, proteins) {
 
 						//// finding the protein or making a new one
 						//
 						var protein;
-						if (proteinData.length === 1) {
-							protein = proteinData[0];
-						} else if (proteinData.length === 0) {
-							protein = new db.Protein(csvProtein);
+						if (proteins.length === 1) {
+							protein = proteins[0];
+//						} else if (proteins.length === 0) {
+//							protein = new db.Protein(csvProtein);
 						} else {
 							console.log('Info (ERR): ' + 'protein:' + csvProtein.ensembl + ' (huh?)');
 						}
 
 						//// add swissprot ID and ensembl ID if not already there
 						//
-						protein.swissprot = csvProtein.swissprot;
-						protein.ensembl = csvProtein.ensembl;
+//						protein.swissprot = csvProtein.swissprot;
+//						protein.ensembl = csvProtein.ensembl;
 
 
 						//// storing protein info
@@ -138,80 +135,104 @@ csv()
 //									console.log('Info (ERR): ' + protein._id);
 //									return;
 //								}
-//								console.log('Info (OK): ' + protein._id);
+//								console.log('Info (OK): ' + prot._id);
 //							});
 //
 //						});
 
 
-						//// Initialize to empty set of small molecules (otherwise... duplicates)
-						//
-						protein.smallMolecules = [];
-
-						//// storing small molecule details
-						//
-						function recursiveOpenPHACTSGet(prot, page, pageSize) {
-							++requestCounter;
-							if (page === 1) {
-								console.log('> Getting first page for: ' + protein._id + overview());
-							} else {
-								console.log('> Getting next page for: ' + protein._id + overview());
-							}
-							openPHACTSGet(prot, listUrl(prot.swissprot, page, pageSize), function (endData) {
-								++responseCounter;
-								console.log('< Got page for:          ' + prot._id + overview());
-
-								_(endData.result.items).forEach(function (item) {
-									prot.smallMolecules.push(item.hasMolecule);
-								});
-
-								//// next page
-								if (page * pageSize < prot.smallMoleculeCount) {
-									recursiveOpenPHACTSGet(protein, page + 1, PAGE_SIZE);
-								} else {
-									prot.save(function (err/*, pprot*/) {
-										if (err) {
-											console.log(' - List (ERR): ' + prot.swissprot + overview());
-											console.log(err);
-											return;
-										}
-										console.log(' - List (OK): ' + prot._id + overview());
-									});
-								}
-
-							});
-						}
-
-
-						//// storing small molecule count
-						//
-						if (_(protein.smallMoleculeCount).isUndefined()) {
-							openPHACTSGet(protein, countUrl(protein.swissprot), function (endData) {
-
-								console.log('Getting Counter for: ' + protein._id);
-
-								protein.smallMoleculeCount = endData.result.primaryTopic.targetPharmacologyTotalResults;
-
-								protein.save(function (err, prot) {
-									if (err) {
-										console.log(' - Count (ERR): ' + protein._id);
-										return;
-									}
-									console.log(' - Count (OK): ' + protein._id);
-
-									if (protein.smallMoleculeCount !== 0) {
-										recursiveOpenPHACTSGet(protein, 1, PAGE_SIZE);
-									}
-
-								});
-
-							});
-						} else if (protein.smallMoleculeCount !== 0) {
-
-							console.log('Already Have Counter for: ' + protein._id + ' = ' + protein.smallMoleculeCount);
-
-							recursiveOpenPHACTSGet(protein, 1, PAGE_SIZE);
-						}
+//						//// Initialize to empty set of small molecules (otherwise... duplicates)
+//						//
+//						protein.smallMoleculeInteractions = [];
+//
+//						//// storing small molecule details
+//						//
+//						function recursiveOpenPHACTSGet(prot, page, pageSize) {
+//							++requestCounter;
+//							if (page === 1) {
+//								console.log('> Getting first page for: ' + protein._id + overview());
+//							} else {
+//								console.log('> Getting next page for: ' + protein._id + overview());
+//							}
+//							openPHACTSGet(prot, listUrl(prot.swissprot, page, pageSize), function (endData) {
+//								++responseCounter;
+//								console.log('< Got page for:          ' + prot._id + overview());
+//
+//								_(endData.result.items).forEach(function (item) {
+//
+//									var smallMoleculeData = item.hasMolecule;
+//									var smID = 'smol:' + smallMoleculeData._about.replace(/^.*\/(\w+)$/, '$1');
+//
+//									prot.smallMoleculeInteractions.push(smID);
+//
+//									if (_(storedSmallMolecules[smID]).isUndefined()) {
+//										storedSmallMolecules[smID] = true;
+//
+//										var smallMolecule = new db.SmallMolecule({
+//											_id: smID,
+//											info: smallMoleculeData
+//										});
+//
+//										smallMolecule.save(function (err, smMol) {
+//											if (err) {
+//												console.error('SmMol Save (ERR): ' + smID);
+//												console.error(err);
+//												return;
+//											}
+//											console.log('SmMol Save (OK): ' + smMol._id);
+//										});
+//
+//									}
+//
+//								});
+//
+//								//// next page
+//								if (page * pageSize < prot.smallMoleculeCount) {
+//									recursiveOpenPHACTSGet(protein, page + 1, PAGE_SIZE);
+//								} else {
+//									prot.save(function (err, pprot) {
+//										if (err) {
+//											console.log(' - List (ERR): ' + prot.swissprot + overview());
+//											console.log(err);
+//											return;
+//										}
+//										console.log(' - List (OK): ' + pprot._id + overview());
+//									});
+//								}
+//
+//							});
+//						}
+//
+//
+//						//// storing small molecule count
+//						//
+//						if (_(protein.smallMoleculeCount).isUndefined()) {
+//							openPHACTSGet(protein, countUrl(protein.swissprot), function (endData) {
+//
+//								console.log('Getting Counter for: ' + protein._id);
+//
+//								protein.smallMoleculeCount = endData.result.primaryTopic.targetPharmacologyTotalResults;
+//
+//								protein.save(function (err, prot) {
+//									if (err) {
+//										console.log(' - Count (ERR): ' + protein._id);
+//										return;
+//									}
+//									console.log(' - Count (OK): ' + prot._id);
+//
+//									if (protein.smallMoleculeCount !== 0) {
+//										recursiveOpenPHACTSGet(protein, 1, PAGE_SIZE);
+//									}
+//
+//								});
+//
+//							});
+//						} else if (protein.smallMoleculeCount !== 0) {
+//
+//							console.log('Already Have Counter for: ' + protein._id + ' = ' + protein.smallMoleculeCount);
+//
+//							recursiveOpenPHACTSGet(protein, 1, PAGE_SIZE);
+//						}
 
 
 					});

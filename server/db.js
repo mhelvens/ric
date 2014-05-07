@@ -148,8 +148,6 @@ var proteinSchema = new mongoose.Schema({
 	ensembl:            StringType(),
 	swissprot:          StringType(),
 	info:               mongoose.Schema.Types.Mixed,
-	smallMoleculeCount: NumberType({ default: 0 }),
-	smallMolecules:     [mongoose.Schema.Types.Mixed], // TODO: convert and delete this field
 	smallMoleculeInteractions: [SmallMoleculeReference()]
 });
 proteinSchema.index({ ensembl: 1 });
