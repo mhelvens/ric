@@ -15,6 +15,14 @@ var csv = require('csv');
 
 var nifToFma = {};
 
+var nameToFma = { // provided by Bernard
+	'lateral paragigantocellular nucleus': '72577',
+	'visual area 1'                      : '236871',
+	'visual area 2'                      : '68615',
+	'intermediate reticular zone'        : '84336',
+	'dorsal medullary raphe'             : '68462'
+};
+
 var failedRegions = {};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +48,13 @@ rd.on('line', function (line) {
 					var fromFMA = nifToFma[fromNIF];
 					var toFMA = nifToFma[toNIF];
 
+					if (_(fromFMA).isUndefined() && !_(nameToFma[record.con_from]).isUndefined()) {
+						fromFMA = nameToFma[record.con_from];
+					}
+					if (_(toFMA).isUndefined() && !_(nameToFma[record.con_to]).isUndefined()) {
+						toFMA = nameToFma[record.con_to];
+					}
+
 					if (_(fromFMA).isUndefined() || _(toFMA).isUndefined()) {
 						if (_(fromFMA).isUndefined()) {
 							failedRegions[record.con_from] = '(' + (fromNIF || '-') + ' ↦ ' + (fromFMA || '-') + ')';
@@ -48,18 +63,39 @@ rd.on('line', function (line) {
 							failedRegions[record.con_to] = '(' + (toNIF || '-') + ' ↦ ' + (toFMA || '-') + ')';
 						}
 					} else { // already added; uncomment to add again
-//						var conn = new db.Path({
-//							from:   'fma:' + fromFMA,
-//							to  :   'fma:' + toFMA,
-//							path: [ 'fma:' + fromFMA, 'fma:' + toFMA ],
-//							type: 'neural'
-//						});
-//						conn.save(function (err/*, c*/) {
-//							if (err) { console.error(err); }
-//						});
 
-						console.log(record.con_from + ' (' + fromFMA + ')' + '  →  ' +
-						            record.con_to   + ' (' + toFMA   + ')');
+						db.Protein.find({ type: 'neural', from: 'fma:'+fromFMA, to: 'fma:'+toFMA }, function (err, connections) {
+
+							if (err) {
+								console.error(err);
+							} else {
+								var connection;
+								if (connections.length === 1) {
+									connection = connections[0];
+									console.log('already have: ' + connection.from + ' -> ' + connection.to);
+								} else if (connections.length === 0) {
+									connection = new db.Path({
+										from:   'fma:' + fromFMA,
+										to  :   'fma:' + toFMA,
+										path: [ 'fma:' + fromFMA, 'fma:' + toFMA ],
+										type: 'neural'
+									});
+									connection.save(function (err, c) {
+										if (err) {
+											console.error(err);
+										} else {
+											console.log('added: ' + c.from + ' -> ' + c.to);
+										}
+									});
+								} else {
+									console.log('Info (ERR): huh?');
+								}
+
+//								console.log(record.con_from + ' (' + fromFMA + ')' + '  →  ' +
+//								            record.con_to + ' (' + toFMA + ')');
+							}
+
+						});
 
 					}
 
