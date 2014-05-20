@@ -9,6 +9,7 @@ var _ = require('lodash');
 var vars = require('./vars');
 var db = require('./db');
 var express = require('express');
+var Q = require('q');
 
 var app = express();
 
@@ -206,10 +207,10 @@ app.post('/resources/entities/:id/externals', function (req, res) {
 		//// add it to the metadata collection too, to get quick access when needed
 
 		var newMeta = new db.Metadata({
-			entity: req.params.id,
-			type  : req.body.type,
-			eid   : req.body.external._id,
-			name  : req.body.external.name,
+			entity      : req.params.id,
+			type        : req.body.type,
+			eid         : req.body.external._id,
+			name        : req.body.external.name,
 			externalType: req.body.external.type
 		});
 
@@ -693,6 +694,36 @@ app.get('/resources/exttypes', function (req, res) {
 		}
 		res.status(HTTP_OK).json(extTypes);
 	});
+});
+
+
+/////////////////////  //  //  /  /  /
+///// Ancestors ////  //  //  /  /  /
+///////////////////  //  //  /  /  /
+
+app.get('/resources/ancestors/:id', function (req, res) {
+	var result = [];
+
+	(function checkParents(id) {
+		return Q.ninvoke(db.Entity.findById(id).populate('super', '_id descendantCount'), 'exec')
+				.then(function (ent) {
+					if (!ent) { return null; }
+					return Q.all(_(ent.super).filter(function (sup) {
+						return !_(sup.descendantCount).isUndefined() && sup.descendantCount >= 0;
+					}).map(function (sup) {
+						if (!_(result).contains(sup._id)) {
+							result.push(sup._id);
+						}
+						return checkParents(sup._id);
+					}).value());
+				});
+	}(req.params.id))
+			.then(function () {
+				res.status(HTTP_OK).json(result);
+			}).catch(function (err) {
+				console.error(err);
+				res.status(HTTP_INTERNAL_SERVER_ERROR).send(err);
+			});
 });
 
 
