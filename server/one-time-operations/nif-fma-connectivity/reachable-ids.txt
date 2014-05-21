@@ -1,0 +1,170 @@
+fma:61884 - Nucleus of stria terminalis
+fma:67440 - Claustrum
+fma:74510 - Central gray substance of midbrain
+fma:54592 - Dorsal motor nucleus of vagus nerve
+fma:62328 - Intermediate periventricular nucleus
+fma:62350 - Posterior nucleus of hypothalamus
+fma:61881 - Septofimbrial nucleus
+fma:72478 - Locus ceruleus
+fma:62341 - Lateral mammillary nucleus
+fma:62315 - Supraoptic crest
+fma:54624 - Posterior cochlear nucleus
+fma:72432 - Interstitial nucleus of medial longitudinal fasciculus
+fma:72576 - Gigantocellular nucleus
+fma:83883 - Uvula of vermis of cerebellum
+fma:68463 - Nucleus of posterior commissure
+fma:54562 - Trigeminal motor nucleus
+fma:62324 - Preoptic periventricular nucleus
+fma:61840 - Medial globus pallidus
+fma:68875 - Pontine raphe nucleus
+fma:62407 - Red nucleus
+fma:72429 - Pedunculopontine tegmental nucleus
+fma:72405 - Olivary pretectal nucleus
+fma:72597 - Intercalated nucleus of medulla
+fma:72606 - Caudal part of spinal trigeminal nucleus
+fma:72240 - Cochlear nuclear complex
+fma:58301 - Retina
+fma:68633 - Brodmann area 36
+fma:72413 - Central nucleus of inferior colliculus
+fma:72615 - Inferior cerebellar peduncle
+fma:256691 - Nucleus of solitary tract
+fma:72243 - Inferior olivary complex
+fma:72471 - Reticulotegmental nucleus
+fma:61899 - Superior parietal lobule
+fma:61887 - Basal nucleus of telencephalon
+fma:72619 - Solitary tract
+fma:72480 - Medial parabrachial nucleus
+fma:62319 - Anterior nucleus of hypothalamus
+fma:72356 - Entorhinal area
+fma:62485 - Periamygdaloid area
+fma:61922 - Dentate gyrus of hippocampus
+fma:62373 - Medial habenular nucleus
+fma:62030 - Lateral hypothalamic region
+fma:62332 - Ventromedial nucleus of hypothalamus
+fma:61885 - Substantia innominata
+fma:72584 - Nucleus raphe magnus
+fma:61891 - Anterior perforated substance
+fma:62317 - Supraoptic nucleus
+fma:68642 - Brodmann area 45
+fma:72473 - Medial superior olivary nucleus
+fma:72436 - Linear nucleus
+fma:68465 - Cuneate nucleus
+fma:61868 - Intercalated amygdaloid nucleus
+fma:72438 - Ventral tegmental area
+fma:54533 - Principal sensory nucleus of trigeminal nerve
+fma:61889 - Nucleus accumbens
+fma:235324 - Interpolar part of spinal trigeminal nucleus
+fma:72412 - External nucleus of inferior colliculus
+fma:72469 - Caudal pontine reticular nucleus
+fma:54504 - Abducens nucleus
+fma:68574 - Sublingual nucleus
+fma:72434 - Dorsal tegmental nucleus
+fma:74627 - Adenohypophysis
+fma:62008 - Hypothalamus
+fma:62493 - Hippocampus proper
+fma:72247 - Superior olivary complex
+fma:83882 - Nodule of vermis of cerebellum
+fma:72404 - Sublentiform nucleus
+fma:68619 - Brodmann area 22
+fma:61833 - Caudate nucleus
+fma:72609 - Arcuate nucleus of medulla
+fma:61867 - Accessory basal amygdaloid nucleus
+fma:61861 - Anterior amygdaloid area
+fma:72358 - Hilus of dentate gyrus
+fma:74042 - CA1 field
+fma:74044 - CA2 field
+fma:62320 - Paraventricular nucleus of hypothalamus
+fma:62335 - Tuberomammillary nucleus
+fma:62372 - Lateral habenular nucleus
+fma:61879 - Medial septal nucleus
+fma:224854 - Primary motor cortex
+fma:62349 - Posterior periventricular nucleus of hypothalamus
+fma:54568 - Mesencephalic nucleus of trigeminal nerve
+fma:62484 - Prepyriform area
+fma:68462 - Dorsal raphe nucleus
+fma:61865 - Nucleus of lateral olfactory tract
+fma:72574 - Lateral reticular nucleus
+fma:62329 - Arcuate nucleus of hypothalamus
+fma:62314 - Anteroventral periventricular nucleus
+fma:62434 - Cingulate gyrus
+fma:62323 - Median preoptic nucleus
+fma:72572 - Posteroventral cochlear nucleus
+fma:72470 - Central gray substance of pons
+fma:72592 - Principal inferior olivary nucleus
+fma:72427 - Cuneiform nucleus
+fma:54582 - Motor nucleus of facial nerve
+fma:72431 - Magnocellular part of red nucleus
+fma:72424 - Parvocellular oculomotor nucleus
+fma:72598 - Diffuse reticular nucleus
+fma:68632 - Brodmann area 35
+fma:74038 - Hippocampal formation
+fma:68855 - Basal amygdaloid nucleus
+fma:77536 - Inferior parietal lobule
+fma:72430 - Parvocellular part of red nucleus
+fma:61834 - Putamen
+fma:61866 - Lateral amygdaloid nucleus
+fma:61862 - Cortical amygdaloid nucleus
+fma:68858 - Medial part of basal amygdaloid nucleus
+fma:74045 - CA3 field
+fma:74414 - Subiculum
+fma:62348 - Premammillary nucleus
+fma:61888 - Island of Calleja
+fma:61882 - Nucleus of diagonal band
+fma:62331 - Dorsomedial nucleus of hypothalamus
+fma:62330 - Retrochiasmatic area
+fma:235322 - Oral part of spinal trigeminal nucleus
+fma:54518 - Trochlear nucleus
+fma:72586 - Nucleus raphe pallidus
+fma:62429 - Neocortex
+fma:54588 - Nucleus ambiguus
+fma:72512 - Pontine nuclear group
+fma:74628 - Neurohypophysis
+fma:58686 - Inner nuclear layer of retina
+fma:72571 - Anteroventral cochlear nucleus
+fma:67883 - Suprachiasmatic nucleus
+fma:68615 - Brodmann area 18
+fma:54505 - Hypoglossal nerve nucleus
+fma:62404 - Inferior colliculus
+fma:72585 - Nucleus raphe obscurus
+fma:72403 - Nucleus of optic tract
+fma:72239 - Vestibular nuclear complex
+fma:74877 - Mammillary body
+fma:61835 - Globus pallidus
+fma:72577 - Lateral paragigantocellular nucleus
+fma:61841 - Amygdala
+fma:68857 - Lateral part of basal amygdaloid nucleus
+fma:62403 - Superior colliculus
+fma:72465 - Superior central nucleus
+fma:62486 - Presubiculum
+fma:77604 - Parasubiculum
+fma:67890 - Medial preoptic nucleus
+fma:62342 - Medial mammillary nucleus
+fma:61878 - Lateral septal nucleus
+fma:72596 - Nucleus prepositus
+fma:74634 - Median eminence of neurohypophysis
+fma:62347 - Supramammillary nucleus
+fma:61883 - Nucleus of anterior commissure
+fma:72602 - Gracile nucleus
+fma:72439 - Interpeduncular nucleus
+fma:83887 - Declive of vermis of cerebellum
+fma:72482 - Superior salivatory nucleus
+fma:72437 - Peripeduncular nucleus
+fma:72607 - Area postrema
+fma:68614 - Brodmann area 17
+fma:72601 - Inferior salivatory nucleus
+fma:72472 - Lateral superior olivary nucleus
+fma:72593 - Dorsal accessory inferior olivary nucleus
+fma:68464 - Ventral nucleus of posterior commissure
+fma:83884 - Lingula of vermis of cerebellum
+fma:72481 - Lateral parabrachial nucleus
+fma:61839 - Lateral globus pallidus
+fma:72603 - Accessory cuneate nucleus
+fma:58704 - Inner plexiform layer of retina
+fma:242003 - Orbitofrontal cortex
+fma:62402 - Pretectal region
+fma:62032 - Habenula
+fma:74889 - Parietal operculum
+fma:67944 - Cerebellum
+fma:62313 - Preoptic area
+fma:62057 - Mammillary princeps fasciculus
+fma:62009 - Epithalamus

@@ -10,6 +10,7 @@ var db = require('../../db');
 var vars = require('../../vars');
 var readLine = require('readline');
 var csv = require('csv');
+var Q = require('q');
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +26,8 @@ var nameToFma = { // provided by Bernard
 
 var failedRegions = {};
 
+var allRegions = {};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 var rd = readLine.createInterface({
@@ -38,9 +41,11 @@ rd.on('line', function (line) {
 	nifToFma[match[2]] = match[1];
 }).on('close', function () {
 	csv()
-			.from.path('nlx_154697-8.csv', { columns: true, trim: true })
+			.from.path('new-records.csv', { columns: true, trim: true })
 			.to.array(function (data/*, count*/) {
 				_(data).forEach(function (record) {
+
+					if (record.species === 'Birds') { return; } // Bernard asked for all non-bird records
 
 					var fromNIF = record.con_from_id;
 					var toNIF = record.con_to_id;
@@ -56,13 +61,15 @@ rd.on('line', function (line) {
 					}
 
 					if (_(fromFMA).isUndefined() || _(toFMA).isUndefined()) {
+
 						if (_(fromFMA).isUndefined()) {
 							failedRegions[record.con_from] = '(' + (fromNIF || '-') + ' ↦ ' + (fromFMA || '-') + ')';
 						}
 						if (_(toFMA).isUndefined()) {
 							failedRegions[record.con_to] = '(' + (toNIF || '-') + ' ↦ ' + (toFMA || '-') + ')';
 						}
-					} else { // already added; uncomment to add again
+
+					} else {
 
 						db.Protein.find({ type: 'neural', from: 'fma:'+fromFMA, to: 'fma:'+toFMA }, function (err, connections) {
 
@@ -84,8 +91,12 @@ rd.on('line', function (line) {
 										if (err) {
 											console.error(err);
 										} else {
-											console.log('added: ' + c.from + ' -> ' + c.to);
+											allRegions['fma:' + fromFMA] = true;
+											allRegions['fma:' + toFMA] = true;
 										}
+//										else {
+//											console.log('added: ' + c.from + ' -> ' + c.to);
+//										}
 									});
 								} else {
 									console.log('Info (ERR): huh?');
@@ -101,11 +112,33 @@ rd.on('line', function (line) {
 
 				});
 
-				console.log('==========================================');
+				setTimeout(function () {
+					console.log('==========================================');
 
-				_(failedRegions).forEach(function (ids, name) {
-					console.log(name + ' ' + ids);
-				});
+					_(failedRegions).forEach(function (ids, name) {
+						console.log(name + ' ' + ids);
+					});
+
+					console.log('==========================================');
+
+					Q.all(_(allRegions).map(function (x, fma) {
+						return Q.ninvoke(db.Entity.findById(fma), 'exec').then(function (ent) {
+							if (ent) {
+								if (ent.descendantCount >= 0) {
+									console.log(ent._id + ' - ' + ent.name);
+								} else {
+//									console.log('meh...');
+								}
+							} else {
+//								console.log('HUH?');
+							}
+						});
+					})).then(function () {
+						console.log('==========================================');
+					});
+				}, 40000);
+
+
 
 			});
 });
