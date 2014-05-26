@@ -71,7 +71,7 @@ rd.on('line', function (line) {
 
 					} else {
 
-						db.Protein.find({ type: 'neural', from: 'fma:'+fromFMA, to: 'fma:'+toFMA }, function (err, connections) {
+						db.Connection.find({ type: 'neural', from: 'fma:'+fromFMA, to: 'fma:'+toFMA }, function (err, connections) {
 
 							if (err) {
 								console.error(err);
