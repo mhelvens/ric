@@ -117,12 +117,16 @@ var unitSchema = new mongoose.Schema({
 var connectionSchema = new mongoose.Schema({
 	from: EntityReference(),
 	to:   EntityReference(),
+	segmentId: StringType(),
 	type: StringType(),
 	subtype: StringType(),
 	entity: EntityReference(),
-	name: StringType()
+	name: StringType(),
+	species: StringType()
 });
-connectionSchema.index({ from: 1, to: 1 }, { unique: true });
+connectionSchema.index({ type: 1, from: 1, to: 1 }, { unique: true });
+connectionSchema.index({ from: 1, to: 1 });
+connectionSchema.index({ segmentId: 1 });
 connectionSchema.index({ type: 1 });
 
 var pathSchema = new mongoose.Schema({
@@ -132,7 +136,7 @@ var pathSchema = new mongoose.Schema({
 	type: StringType(),
 	subtype: StringType()
 });
-pathSchema.index({ type: 1, from: 1, to: 1 });
+pathSchema.index({ type: 1, from: 1, to: 1 }, { unique: true });
 pathSchema.index({ from: 1, to: 1 });
 pathSchema.index({ type: 1 });
 

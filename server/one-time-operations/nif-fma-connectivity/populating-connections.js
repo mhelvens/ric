@@ -71,32 +71,42 @@ rd.on('line', function (line) {
 
 					} else {
 
-						db.Connection.find({ type: 'neural', from: 'fma:'+fromFMA, to: 'fma:'+toFMA }, function (err, connections) {
+						db.Path.find({ type: 'neural', from: 'fma:'+fromFMA, to: 'fma:'+toFMA }, function (err, connections) {
 
 							if (err) {
 								console.error(err);
 							} else {
-								var connection;
+								var path;
 								if (connections.length === 1) {
-									connection = connections[0];
-									console.log('already have: ' + connection.from + ' -> ' + connection.to);
+									path = connections[0];
+									console.log('already have: ' + path.from + ' -> ' + path.to);
 								} else if (connections.length === 0) {
-									connection = new db.Path({
+									path = new db.Path({
 										from:   'fma:' + fromFMA,
 										to  :   'fma:' + toFMA,
 										path: [ 'fma:' + fromFMA, 'fma:' + toFMA ],
-										type: 'neural'
+										type: 'neural',
+										species: record.species
 									});
-									connection.save(function (err, c) {
+									path.save(function (err, c) {
 										if (err) {
 											console.error(err);
 										} else {
 											allRegions['fma:' + fromFMA] = true;
 											allRegions['fma:' + toFMA] = true;
 										}
-//										else {
-//											console.log('added: ' + c.from + ' -> ' + c.to);
-//										}
+
+										var segment = new db.Connection({
+											from:   'fma:' + fromFMA,
+											to  :   'fma:' + toFMA,
+											type: 'neural',
+											species: record.species
+										});
+										segment.save(function (err, s) {
+											if (err) {
+												console.error(err);
+											}
+										});
 									});
 								} else {
 									console.log('Info (ERR): huh?');

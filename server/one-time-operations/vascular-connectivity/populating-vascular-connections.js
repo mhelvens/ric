@@ -15,6 +15,7 @@ var Q = require('q');
 
 var segments = [];
 var segmentMap = {};
+var segmentIdMap = {};
 var toFMA = {};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,32 +82,24 @@ rd.on('line', function (line) {
 	});
 
 
-	//// now populating segmentMap
+	//// now populating segmentMap and segmentIdMap
 	//
 	_(segments).forEach(function (segment) {
 		segmentMap[segment.node1 + '-' + segment.node2] = segment;
+		segmentIdMap[segment.segmentId] = segment;
 	});
 
 	////////// At this point, 8882 segments are left, all of them pointing FROM the heart TO the organs
 
 
-//	//// now putting them in the database; NOTE: IS ALREADY DONE
-//	//
-//	var counter = 0;
+//	console.log("putting the segments in the database"); // DONE
+//	var segmentCounter = 0;
 //	_(segments).forEach(function (segment) {
 //
-//		var from, to;
-//		if (segment.type === 1) {//// type 1, arterial: heart --> organ (so, keep the order)
-//			from = segment.node1;
-//			to = segment.node2;
-//		} else {///////////////////// type 3, venous:   organ --> heart (so, flip the order)
-//			from = segment.node2;
-//			to = segment.node1;
-//		}
-//
 //		var connection = new db.Connection({
-//			from: from,
-//			to: to,
+//			segmentId: segment.segmentId,
+//			from: segment.node1,
+//			to: segment.node2,
 //			type: 'vascular',
 //			subtype: (segment.type === 1 ? 'arterial' : 'venous'),
 //			entity: segment.fma,
@@ -119,16 +112,14 @@ rd.on('line', function (line) {
 //				console.log(from, to);
 //				debugger;
 //			}
-//			++counter;
-//			console.log(counter);
+//			++segmentCounter;
+//			console.log('s: ' + segmentCounter);
 //		});
-//
 //	});
 
 
-	//// now putting the full PATHS in the database
+	//// now making an in-memory graph of connected nodes
 	//
-
 	var heartChambers = {};
 	var organs = {};
 	var nodes = {};
@@ -147,50 +138,50 @@ rd.on('line', function (line) {
 		}
 	});
 
-	console.log('STARTING');
-
-	var pathCounter = 0;
+	//// Defining a depth first traversal function for the graph
+	//
 	var stack = [];
-
 	var pathsDone = {};
+	function depthFirst(nodeId, fn, stopOnlyAtFMA) {
 
-	function depthFirst(nodeId, fn) {
+		if (_(stack).contains(nodeId)) { return; } // Break cycles
 
-		if (_(stack).contains(nodeId)) { return; }
+		stack.push(nodeId); // Push onto the stack
 
-		stack.push(nodeId);
-
-		if (_(nodes[nodeId].predecessors).isEmpty() && (nodeId === 'fma:7165' || nodeId === 'fma:7166')) { // ending at a heart chamber
-//			console.log(stack);
-//			debugger;
-//			++pathCounter;
-//			console.log(pathCounter);
-
-			(function (stackCopy) {
-				if (!pathsDone[_.first(stackCopy) + '-' + _.last(stackCopy)]) {
-					pathsDone[_.first(stackCopy) + '-' + _.last(stackCopy)] = true;
-
-					fn(stackCopy);
-
-				}
-			}(_.clone(stack)));
-		} else {
+		if (!stopOnlyAtFMA || (_(nodes[nodeId].predecessors).isEmpty() && (nodeId === 'fma:7165' || nodeId === 'fma:7166'))) {
+			fn(_.clone(stack));
+		}
+		if (!(_(nodes[nodeId].predecessors).isEmpty() && (nodeId === 'fma:7165' || nodeId === 'fma:7166'))) { // ending at a heart chamber
 			_(nodes[nodeId].predecessors).forEach(function (succ) {
 				depthFirst(succ, fn);
 			});
 		}
 
-		stack.pop();
+		stack.pop(); // Pop from the stack
 	}
 
-//// Add the paths to the database; NOTE: already done
+//	var pathCounter = 0;
+//	console.log("Adding the paths to the database"); // DONE
 //	_(organs).keys().forEach(function (organ) {
 //		depthFirst(organ, function (stack) {
+//
+//			//// register path subtype (arterial / venous) by checking the first connection
+//			var type = segmentMap[stack[1] + '-' + stack[0]].type;
+//
+//			//// double checking other connections for inconsistencies (none found, yay!)
+//			for (var i = stack.length-1; 1 < i; --i) {
+//				if (type !== segmentMap[stack[i] + '-' + stack[i-1]].type) {
+//					console.error('oh oh...');
+//					debugger;
+//				}
+//			}
+//
 //			var path = new db.Path({
 //				from: _.first(stack),
 //				to: _.last(stack),
 //				path: stack,
-//				type: 'vascular'
+//				type: 'vascular',
+//				subtype: (type === 1 ? 'arterial' : 'venous')
 //			});
 //
 //			path.save(function (err, c) {
@@ -200,53 +191,53 @@ rd.on('line', function (line) {
 //					debugger;
 //				}
 //				++pathCounter;
-//				console.log(pathCounter);
+//				console.log('p:      ' + pathCounter);
 //			});
-//		})
+//		}, true);
 //	});
 
-//// Finding and storing subtype (arterial/venous) for paths; NOTE: already done
-//	_(organs).keys().forEach(function (organ) {
-//		depthFirst(organ, function (stack) {
-//			db.Path.find({from: _.first(stack), to: _.last(stack), type: 'vascular'}, function (err, paths) {
-//				if (err) {
-//					console.error(err);
-//					debugger;
-//				}
-//				var path = paths[0];
-//				if (!path) {
-//					console.error('huh?');
-//					debugger;
-//				}
+
+	function forAllPairs(A, fn) {
+		var firstNode = A[0];
+		for (var i = 1; i < A.length; ++i) {
+			fn(firstNode, A[i]);
+			firstNode = A[i];
+		}
+	}
+
+
+//	//// Finding the shortest paths between these pairs of segments, as requested by Bernard (DONE)
+//	_([['2400','2401'], ['2567','2651'], ['3774','3774'], ['4282','4282'], ['4701','4703'], ['4705','4709'],
+//	   ['3179','4764'], ['4813','5573'], ['5612','5866'], ['6030','6036'], ['6042','6310'], ['6329','6888'] ]).forEach(function (segmentPair) {
 //
-//				//// register path subtype (arterial / venous) by checking the first connection
-//				//
-//				var type = segmentMap[stack[1] + '-' + stack[0]].type;
+//		var startNode = segmentIdMap[segmentPair[1]].node2;
+//		var endNode   = segmentIdMap[segmentPair[0]].node1;
 //
-//				//// double checking other connections for inconsistencies (none found, yay!)
-//				//
-//				for (var i = stack.length-1; 1 < i; --i) {
-//					if (type !== segmentMap[stack[i] + '-' + stack[i-1]].type) {
-//						console.error('oh oh...');
-//						debugger;
-//					}
-//				}
+//		console.log('==================== ', startNode, endNode);
 //
-//				//// store the subtype to the database
-//				//
-//				path.subtype = (type === 1 ? 'arterial' : 'venous');
-//				path.save(function (err, c) {
-//					if (err) {
-//						console.log(err);
-//						console.log(from, to);
-//						debugger;
-//					}
-//					++pathCounter;
-//					console.log('#' + pathCounter);
+//		pathsDone = {};
+//		depthFirst(startNode, function (stack) {
+//			if (_(stack).last() === endNode) {
+//
+//				stack.reverse();
+//
+//				var result = [];
+//				forAllPairs(stack, function (a, b) {
+//					result.push(segmentMap[a + '-' + b].segmentId);
 //				});
-//			});
-//		})
+//
+//				console.log(result.join(' - '));
+//
+//			}
+//		}, false);
+//
 //	});
+
+
+
+
+
+
 
 
 });
