@@ -124,7 +124,8 @@ var connectionSchema = new mongoose.Schema({
 	name: StringType(),
 	species: StringType()
 });
-connectionSchema.index({ type: 1, from: 1, to: 1 }, { unique: true });
+connectionSchema.index({ type: 1, from: 1, to: 1, species: 1 }, { unique: true });
+connectionSchema.index({ type: 1, from: 1, to: 1 });
 connectionSchema.index({ from: 1, to: 1 });
 connectionSchema.index({ segmentId: 1 });
 connectionSchema.index({ type: 1 });
