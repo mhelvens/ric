@@ -101,10 +101,11 @@ var entitySchema = new mongoose.Schema({
 	proteins:            [ProteinReference()],
 	proteinInteractions: [subProteinInteractionSchema],
 	reachable:           BooleanType(),
-	descendantCount:     NumberType(),
+	descendantCount:     NumberType({ default: -1 }),
 	tile:                mongoose.Schema.Types.Mixed,
 	tileMap:             mongoose.Schema.Types.Mixed
 }, { _id: false });
+// TODO: use mongoose to add text-search index; now using `db.entities.ensureIndex({ _id: 'text', name: 'text' })`
 entitySchema.index({ externals: 1 });
 
 var unitSchema = new mongoose.Schema({
