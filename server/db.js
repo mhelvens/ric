@@ -59,6 +59,10 @@ function ProteinReference(other) {
 	return StringType(_.assign({ ref: 'Protein' }, other));
 }
 
+function GeneTranslationReference(other) {
+	return StringType(_.assign({ ref: 'GeneTranslation' }, other));
+}
+
 function SmallMoleculeReference(other) {
 	return StringType(_.assign({ ref: 'SmallMolecule' }, other));
 }
@@ -116,14 +120,14 @@ var unitSchema = new mongoose.Schema({
 }, { _id: false });
 
 var connectionSchema = new mongoose.Schema({
-	from: EntityReference(),
-	to:   EntityReference(),
+	from:      EntityReference(),
+	to:        EntityReference(),
 	segmentId: StringType(),
-	type: StringType(),
-	subtype: StringType(),
-	entity: EntityReference(),
-	name: StringType(),
-	species: StringType()
+	type:      StringType(),
+	subtype:   StringType(),
+	entity:    EntityReference(),
+	name:      StringType(),
+	species:   StringType()
 });
 connectionSchema.index({ type: 1, from: 1, to: 1, species: 1 }, { unique: true });
 connectionSchema.index({ type: 1, from: 1, to: 1 });
@@ -132,10 +136,10 @@ connectionSchema.index({ segmentId: 1 });
 connectionSchema.index({ type: 1 });
 
 var pathSchema = new mongoose.Schema({
-	from: EntityReference(),
-	to:   EntityReference(),
-	path: [EntityReference()],
-	type: StringType(),
+	from:    EntityReference(),
+	to:      EntityReference(),
+	path:    [EntityReference()],
+	type:    StringType(),
 	subtype: StringType()
 });
 pathSchema.index({ type: 1, from: 1, to: 1 }, { unique: true });
@@ -155,14 +159,28 @@ metadataSchema.index({ externalType: 1 });
 metadataSchema.index({ entity: 1, type: 1, eid: 1 }, { unique: true });
 
 var proteinSchema = new mongoose.Schema({
-	_id:                StringType({ unique: true }),
-	ensembl:            StringType(),
-	swissprot:          StringType(),
-	info:               mongoose.Schema.Types.Mixed,
-	smallMoleculeInteractions: [SmallMoleculeReference()]
+	_id:                       StringType({ unique: true }),
+	ensembl:                   StringType(),
+	swissprot:                 StringType(),
+	info:                      mongoose.Schema.Types.Mixed,
+	smallMoleculeInteractions: [SmallMoleculeReference()],
+	translations:              [GeneTranslationReference()]
 });
 proteinSchema.index({ ensembl: 1 });
 proteinSchema.index({ swissprot: 1 });
+
+var geneTranslationSchema = new mongoose.Schema({
+	_id:     StringType({ unique: true }),
+	ensembl: StringType(),
+	length:  NumberType(),
+	domains: [{
+		          start: NumberType(),
+		          end: NumberType(),
+		          type: StringType(),
+		          pfam_id: StringType(),
+		          pfam_name: StringType()
+	          }]
+});
 
 var smallMoleculeSchema = new mongoose.Schema({
 	_id:  StringType({ unique: true }),
@@ -180,4 +198,5 @@ exports.Connection = mongoose.model('Connection', connectionSchema);
 exports.Path = mongoose.model('Path', pathSchema);
 exports.Metadata = mongoose.model('Metadata', metadataSchema);
 exports.Protein = mongoose.model('Protein', proteinSchema);
+exports.GeneTranslation = mongoose.model('GeneTranslation', geneTranslationSchema);
 exports.SmallMolecule = mongoose.model('SmallMolecule', smallMoleculeSchema);
